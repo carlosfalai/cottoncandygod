@@ -8,15 +8,40 @@ class YogaMarathonApp {
         this.currentSession = 0;
         this.userProgress = this.loadProgress();
         this.customSequence = this.loadCustomSequence();
-        this.billboardMessages = [
-            { text: '🙏 "Earth Peace Through Self Peace" - Yogiraj Siddhanath', type: 'quote' },
-            { text: '🌕 Join Full Moon Earth Peace Meditation - 7-9 PM your local time', type: 'event' },
-            { text: '🧘 Practice Kriya Yoga daily for spiritual evolution', type: 'tip' },
-            { text: '📍 Visit siddhanath.org for retreats and empowerments', type: 'info' },
-            { text: '💫 "The breath is the bridge between body and soul"', type: 'quote' },
-        ];
+        this.billboardMessages = this.loadBillboardMessages();
         this.billboardIndex = 0;
         this.init();
+    }
+
+    getDefaultBillboardMessages() {
+        return [
+            { id: 1, text: '🙏 "Earth Peace Through Self Peace" - Yogiraj Siddhanath', type: 'quote' },
+            { id: 2, text: '🌕 Join Full Moon Earth Peace Meditation - 7-9 PM your local time', type: 'event' },
+            { id: 3, text: '🧘 Practice Kriya Yoga daily for spiritual evolution', type: 'tip' },
+            { id: 4, text: '📍 Visit siddhanath.org for retreats and empowerments', type: 'info' },
+            { id: 5, text: '💫 "The breath is the bridge between body and soul"', type: 'quote' },
+        ];
+    }
+
+    loadBillboardMessages() {
+        try {
+            const saved = localStorage.getItem('siddhanath-billboard-messages');
+            if (saved) {
+                const messages = JSON.parse(saved);
+                if (messages.length > 0) return messages;
+            }
+        } catch (e) {
+            console.error('Error loading billboard messages:', e);
+        }
+        return this.getDefaultBillboardMessages();
+    }
+
+    saveBillboardMessages() {
+        try {
+            localStorage.setItem('siddhanath-billboard-messages', JSON.stringify(this.billboardMessages));
+        } catch (e) {
+            console.error('Error saving billboard messages:', e);
+        }
     }
 
     async init() {
@@ -253,6 +278,99 @@ class YogaMarathonApp {
             case 'close-feedback':
                 this.closeFeedbackModal();
                 break;
+            case 'open-billboard-editor':
+                this.openBillboardEditor();
+                break;
+            case 'close-billboard-editor':
+                this.closeBillboardEditor();
+                break;
+            case 'add-billboard-message':
+                this.addBillboardMessage();
+                break;
+            case 'delete-billboard-message':
+                this.deleteBillboardMessage(parseInt(element.dataset.index));
+                break;
+            case 'reset-billboard-messages':
+                this.resetBillboardMessages();
+                break;
+        }
+    }
+
+    openBillboardEditor() {
+        const modal = document.getElementById('billboard-editor-modal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    closeBillboardEditor() {
+        const modal = document.getElementById('billboard-editor-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    initBillboardEditor() {
+        const list = document.getElementById('billboard-messages-list');
+        if (!list) return;
+
+        // Handle text input changes
+        list.addEventListener('input', (e) => {
+            if (e.target.classList.contains('message-text-input')) {
+                const index = parseInt(e.target.dataset.index);
+                if (this.billboardMessages[index]) {
+                    this.billboardMessages[index].text = e.target.value;
+                    this.saveBillboardMessages();
+                }
+            }
+        });
+
+        // Handle type select changes
+        list.addEventListener('change', (e) => {
+            if (e.target.classList.contains('message-type-select')) {
+                const index = parseInt(e.target.dataset.index);
+                if (this.billboardMessages[index]) {
+                    this.billboardMessages[index].type = e.target.value;
+                    this.saveBillboardMessages();
+                }
+            }
+        });
+    }
+
+    addBillboardMessage() {
+        this.billboardMessages.push({
+            id: Date.now(),
+            text: '✨ Your custom message here',
+            type: 'tip'
+        });
+        this.saveBillboardMessages();
+        this.rerenderBillboardList();
+    }
+
+    deleteBillboardMessage(index) {
+        if (this.billboardMessages.length > 1) {
+            this.billboardMessages.splice(index, 1);
+            this.saveBillboardMessages();
+            this.rerenderBillboardList();
+        } else {
+            alert('You must have at least one message.');
+        }
+    }
+
+    resetBillboardMessages() {
+        if (confirm('Reset billboard messages to defaults?')) {
+            this.billboardMessages = this.getDefaultBillboardMessages();
+            this.saveBillboardMessages();
+            this.rerenderBillboardList();
+        }
+    }
+
+    rerenderBillboardList() {
+        const list = document.getElementById('billboard-messages-list');
+        if (list) {
+            list.innerHTML = this.billboardMessages.map((msg, idx) =>
+                this.renderBillboardMessageItem(msg, idx)
+            ).join('');
         }
     }
 
@@ -349,35 +467,48 @@ class YogaMarathonApp {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const status = document.getElementById('feedback-status');
+                const submitBtn = form.querySelector('button[type="submit"]');
                 const data = {
                     name: document.getElementById('feedback-name').value || 'Anonymous',
                     email: document.getElementById('feedback-email').value || '',
                     type: document.getElementById('feedback-type').value,
-                    message: document.getElementById('feedback-message').value,
-                    timestamp: new Date().toISOString(),
-                    page: window.location.href,
-                    userAgent: navigator.userAgent
+                    message: document.getElementById('feedback-message').value
                 };
 
                 status.textContent = 'Sending...';
                 status.className = '';
+                submitBtn.disabled = true;
 
                 try {
-                    // Store locally (could be sent to a backend)
+                    // Send to Cloudflare Worker (sends SMS via Twilio)
+                    const response = await fetch('https://siddhanath-feedback.cff-704.workers.dev', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        status.textContent = '✓ Feedback sent! Thank you for your message.';
+                        status.className = 'success';
+                        form.reset();
+                    } else {
+                        throw new Error(result.error || 'Failed to send feedback');
+                    }
+                } catch (error) {
+                    console.error('Feedback error:', error);
+                    // Fallback: store locally and show email option
                     const feedbacks = JSON.parse(localStorage.getItem('siddhanath-feedbacks') || '[]');
-                    feedbacks.push(data);
+                    feedbacks.push({ ...data, timestamp: new Date().toISOString() });
                     localStorage.setItem('siddhanath-feedbacks', JSON.stringify(feedbacks));
 
-                    // For now, also open email client as fallback
                     const subject = encodeURIComponent(`[Siddhanath App] ${data.type}: Feedback`);
                     const body = encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\nType: ${data.type}\n\nMessage:\n${data.message}`);
-
-                    status.innerHTML = `✓ Feedback saved! <a href="mailto:instanthpi@gmail.com?subject=${subject}&body=${body}" target="_blank">Click to send via email</a>`;
-                    status.className = 'success';
-                    form.reset();
-                } catch (error) {
-                    status.textContent = '✗ Error saving feedback. Please try again.';
-                    status.className = 'error';
+                    status.innerHTML = `⚠ Saved locally. <a href="mailto:instanthpi@gmail.com?subject=${subject}&body=${body}" target="_blank">Send via email</a>`;
+                    status.className = 'warning';
+                } finally {
+                    submitBtn.disabled = false;
                 }
             });
         }
@@ -504,8 +635,10 @@ class YogaMarathonApp {
                 ${this.renderFooter()}
             </div>
             ${this.renderFeedbackModal()}
+            ${this.renderBillboardEditorModal()}
         `;
         this.initDragAndDrop();
+        this.initBillboardEditor();
     }
 
     renderBillboard() {
@@ -514,6 +647,47 @@ class YogaMarathonApp {
                 <div class="billboard-ticker" id="billboard-ticker">
                     <span class="billboard-message">🙏 Loading...</span>
                 </div>
+                <button class="billboard-edit-btn" data-action="open-billboard-editor" title="Edit Messages">✏️</button>
+            </div>
+        `;
+    }
+
+    renderBillboardEditorModal() {
+        return `
+            <div id="billboard-editor-modal" class="modal" style="display: none;">
+                <div class="modal-content billboard-editor-modal">
+                    <button class="modal-close" data-action="close-billboard-editor">×</button>
+                    <h2>📝 Edit Billboard Messages</h2>
+                    <p>Customize the scrolling messages. Add your own quotes, reminders, or inspiration.</p>
+                    <div class="billboard-messages-list" id="billboard-messages-list">
+                        ${this.billboardMessages.map((msg, idx) => this.renderBillboardMessageItem(msg, idx)).join('')}
+                    </div>
+                    <div class="billboard-editor-actions">
+                        <button class="practice-btn" data-action="add-billboard-message">+ Add Message</button>
+                        <button class="practice-btn" data-action="reset-billboard-messages">↺ Reset to Default</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderBillboardMessageItem(msg, index) {
+        const typeOptions = ['quote', 'event', 'tip', 'info'].map(t =>
+            `<option value="${t}" ${msg.type === t ? 'selected' : ''}>${t}</option>`
+        ).join('');
+
+        return `
+            <div class="billboard-message-item" data-index="${index}">
+                <select class="message-type-select" data-action="change-message-type" data-index="${index}">
+                    ${typeOptions}
+                </select>
+                <input type="text"
+                       class="message-text-input"
+                       value="${msg.text.replace(/"/g, '&quot;')}"
+                       data-action="change-message-text"
+                       data-index="${index}"
+                       placeholder="Enter your message...">
+                <button class="technique-delete" data-action="delete-billboard-message" data-index="${index}">×</button>
             </div>
         `;
     }
@@ -706,7 +880,7 @@ class YogaMarathonApp {
                     <div class="logo-section">
                         <img src="./generated-icon.png" alt="Siddhanath Yoga" class="logo">
                         <div class="title-section">
-                            <h1>Siddhanath Yoga Marathon</h1>
+                            <h1>Siddhanath Kriya Yoga</h1>
                             <p>Journey Through Sacred Teachings</p>
                         </div>
                     </div>
@@ -1186,11 +1360,11 @@ class YogaMarathonApp {
         const completedSessions = this.userProgress.completedSessions.length;
         const progressPercentage = totalSessions > 0 ? (completedSessions / totalSessions * 100).toFixed(1) : 0;
         
-        const shareText = `I'm on my Siddhanath Yoga Marathon journey! 🧘‍♂️\\n\\n📊 Progress: ${progressPercentage}% (${completedSessions}/${totalSessions} sessions)\\n🔥 Current streak: ${this.userProgress.currentStreak} days\\n\\nJoin me at: ${window.location.href}`;
+        const shareText = `I'm on my Siddhanath Kriya Yoga journey! 🧘‍♂️\\n\\n📊 Progress: ${progressPercentage}% (${completedSessions}/${totalSessions} sessions)\\n🔥 Current streak: ${this.userProgress.currentStreak} days\\n\\nJoin me at: ${window.location.href}`;
         
         if (navigator.share) {
             navigator.share({
-                title: 'My Siddhanath Yoga Marathon Progress',
+                title: 'My Siddhanath Kriya Yoga Progress',
                 text: shareText,
                 url: window.location.href
             });
