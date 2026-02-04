@@ -7,6 +7,15 @@ class YogaMarathonApp {
         this.currentBelt = 0;
         this.currentSession = 0;
         this.userProgress = this.loadProgress();
+        this.customSequence = this.loadCustomSequence();
+        this.billboardMessages = [
+            { text: '🙏 "Earth Peace Through Self Peace" - Yogiraj Siddhanath', type: 'quote' },
+            { text: '🌕 Join Full Moon Earth Peace Meditation - 7-9 PM your local time', type: 'event' },
+            { text: '🧘 Practice Kriya Yoga daily for spiritual evolution', type: 'tip' },
+            { text: '📍 Visit siddhanath.org for retreats and empowerments', type: 'info' },
+            { text: '💫 "The breath is the bridge between body and soul"', type: 'quote' },
+        ];
+        this.billboardIndex = 0;
         this.init();
     }
 
@@ -17,7 +26,8 @@ class YogaMarathonApp {
         this.setupEventListeners();
         this.renderApp();
         this.startProgressTracking();
-        
+        this.startBillboard();
+
         // Hide loading screen
         const loadingScreen = document.querySelector('.loading-screen');
         if (loadingScreen) {
@@ -26,6 +36,53 @@ class YogaMarathonApp {
                 setTimeout(() => loadingScreen.remove(), 500);
             }, 1000);
         }
+    }
+
+    loadCustomSequence() {
+        try {
+            const saved = localStorage.getItem('siddhanath-custom-sequence');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        } catch (e) {
+            console.error('Error loading custom sequence:', e);
+        }
+        // Default sequence
+        return [
+            { id: 1, name: 'Omkar Kriya', duration: 15, enabled: true },
+            { id: 2, name: 'Shiva Shakti Kriya', duration: 20, enabled: true },
+            { id: 3, name: 'Mahamudra', duration: 10, enabled: true },
+            { id: 4, name: 'Paravastha', duration: 15, enabled: true },
+            { id: 5, name: 'Nabho Kriya', duration: 5, enabled: true },
+            { id: 6, name: 'Jyoti Mudra', duration: 10, enabled: true },
+        ];
+    }
+
+    saveCustomSequence() {
+        try {
+            localStorage.setItem('siddhanath-custom-sequence', JSON.stringify(this.customSequence));
+        } catch (e) {
+            console.error('Error saving custom sequence:', e);
+        }
+    }
+
+    startBillboard() {
+        const billboard = document.getElementById('billboard-ticker');
+        if (!billboard) return;
+
+        this.updateBillboard();
+        setInterval(() => this.updateBillboard(), 6000);
+    }
+
+    updateBillboard() {
+        const billboard = document.getElementById('billboard-ticker');
+        if (!billboard) return;
+
+        const message = this.billboardMessages[this.billboardIndex % this.billboardMessages.length];
+        billboard.innerHTML = `<span class="billboard-message billboard-${message.type}">${message.text}</span>`;
+        billboard.classList.add('billboard-animate');
+        setTimeout(() => billboard.classList.remove('billboard-animate'), 500);
+        this.billboardIndex++;
     }
 
     async loadData() {
@@ -175,6 +232,154 @@ class YogaMarathonApp {
             case 'show-all-events':
                 this.showAllEvents();
                 break;
+            case 'toggle-technique':
+                this.toggleTechnique(parseInt(element.dataset.index));
+                break;
+            case 'delete-technique':
+                this.deleteTechnique(parseInt(element.dataset.index));
+                break;
+            case 'add-technique':
+                this.addTechnique();
+                break;
+            case 'start-practice':
+                this.startPractice();
+                break;
+            case 'reset-sequence':
+                this.resetSequence();
+                break;
+            case 'open-feedback':
+                this.openFeedbackModal();
+                break;
+            case 'close-feedback':
+                this.closeFeedbackModal();
+                break;
+        }
+    }
+
+    toggleTechnique(index) {
+        if (this.customSequence[index]) {
+            this.customSequence[index].enabled = !this.customSequence[index].enabled;
+            this.saveCustomSequence();
+            const item = document.querySelector(`.technique-item[data-index="${index}"]`);
+            if (item) {
+                item.classList.toggle('disabled');
+                const toggle = item.querySelector('.technique-toggle');
+                toggle.textContent = this.customSequence[index].enabled ? '✓' : '○';
+            }
+            this.updatePracticeTotal();
+        }
+    }
+
+    deleteTechnique(index) {
+        if (this.customSequence.length > 1 && confirm('Delete this technique?')) {
+            this.customSequence.splice(index, 1);
+            this.saveCustomSequence();
+            this.rerenderPractice();
+        }
+    }
+
+    addTechnique() {
+        const name = prompt('Enter technique name:', 'New Technique');
+        if (name) {
+            const duration = parseInt(prompt('Duration in minutes:', '10')) || 10;
+            this.customSequence.push({
+                id: Date.now(),
+                name: name,
+                duration: Math.max(1, Math.min(120, duration)),
+                enabled: true
+            });
+            this.saveCustomSequence();
+            this.rerenderPractice();
+        }
+    }
+
+    startPractice() {
+        const enabledTechniques = this.customSequence.filter(t => t.enabled);
+        if (enabledTechniques.length === 0) {
+            alert('Please enable at least one technique.');
+            return;
+        }
+        const totalMinutes = enabledTechniques.reduce((sum, t) => sum + t.duration, 0);
+        const sequence = enabledTechniques.map(t => `${t.name} (${t.duration} min)`).join('\n• ');
+        alert(`🧘 Starting Practice\n\nSequence:\n• ${sequence}\n\nTotal: ${totalMinutes} minutes\n\nOm Shanti 🙏`);
+    }
+
+    resetSequence() {
+        if (confirm('Reset to default sequence?')) {
+            this.customSequence = [
+                { id: 1, name: 'Omkar Kriya', duration: 15, enabled: true },
+                { id: 2, name: 'Shiva Shakti Kriya', duration: 20, enabled: true },
+                { id: 3, name: 'Mahamudra', duration: 10, enabled: true },
+                { id: 4, name: 'Paravastha', duration: 15, enabled: true },
+                { id: 5, name: 'Nabho Kriya', duration: 5, enabled: true },
+                { id: 6, name: 'Jyoti Mudra', duration: 10, enabled: true },
+            ];
+            this.saveCustomSequence();
+            this.rerenderPractice();
+        }
+    }
+
+    rerenderPractice() {
+        const section = document.querySelector('.my-practice');
+        if (section) {
+            section.outerHTML = this.renderMyPractice();
+            this.initDragAndDrop();
+        }
+    }
+
+    openFeedbackModal() {
+        const modal = document.getElementById('feedback-modal');
+        if (modal) {
+            modal.style.display = 'flex';
+            this.setupFeedbackForm();
+        }
+    }
+
+    closeFeedbackModal() {
+        const modal = document.getElementById('feedback-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    setupFeedbackForm() {
+        const form = document.getElementById('feedback-form');
+        if (form && !form.dataset.initialized) {
+            form.dataset.initialized = 'true';
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const status = document.getElementById('feedback-status');
+                const data = {
+                    name: document.getElementById('feedback-name').value || 'Anonymous',
+                    email: document.getElementById('feedback-email').value || '',
+                    type: document.getElementById('feedback-type').value,
+                    message: document.getElementById('feedback-message').value,
+                    timestamp: new Date().toISOString(),
+                    page: window.location.href,
+                    userAgent: navigator.userAgent
+                };
+
+                status.textContent = 'Sending...';
+                status.className = '';
+
+                try {
+                    // Store locally (could be sent to a backend)
+                    const feedbacks = JSON.parse(localStorage.getItem('siddhanath-feedbacks') || '[]');
+                    feedbacks.push(data);
+                    localStorage.setItem('siddhanath-feedbacks', JSON.stringify(feedbacks));
+
+                    // For now, also open email client as fallback
+                    const subject = encodeURIComponent(`[Siddhanath App] ${data.type}: Feedback`);
+                    const body = encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\nType: ${data.type}\n\nMessage:\n${data.message}`);
+
+                    status.innerHTML = `✓ Feedback saved! <a href="mailto:instanthpi@gmail.com?subject=${subject}&body=${body}" target="_blank">Click to send via email</a>`;
+                    status.className = 'success';
+                    form.reset();
+                } catch (error) {
+                    status.textContent = '✗ Error saving feedback. Please try again.';
+                    status.className = 'error';
+                }
+            });
         }
     }
 
@@ -286,14 +491,210 @@ class YogaMarathonApp {
         console.log('Rendering app...');
         const app = document.getElementById('app');
         app.innerHTML = `
+            ${this.renderBillboard()}
             <div class="yoga-marathon-app">
                 ${this.renderHeader()}
                 ${this.renderUpcomingEvents()}
+                ${this.renderMyPractice()}
                 ${this.renderProgressDashboard()}
                 ${this.renderBeltProgression()}
                 ${this.renderCurrentSession()}
                 ${this.renderSacredSayings()}
+                ${this.renderFeedbackButton()}
                 ${this.renderFooter()}
+            </div>
+            ${this.renderFeedbackModal()}
+        `;
+        this.initDragAndDrop();
+    }
+
+    renderBillboard() {
+        return `
+            <div class="billboard-container">
+                <div class="billboard-ticker" id="billboard-ticker">
+                    <span class="billboard-message">🙏 Loading...</span>
+                </div>
+            </div>
+        `;
+    }
+
+    renderMyPractice() {
+        const totalDuration = this.customSequence
+            .filter(t => t.enabled)
+            .reduce((sum, t) => sum + t.duration, 0);
+
+        return `
+            <section class="my-practice">
+                <div class="practice-header">
+                    <h2>🧘 My Practice Sequence</h2>
+                    <div class="practice-total">Total: ${totalDuration} min</div>
+                </div>
+                <p class="practice-hint">Drag to reorder • Click duration to edit • Toggle to enable/disable</p>
+                <div class="technique-list" id="technique-list">
+                    ${this.customSequence.map((tech, idx) => this.renderTechniqueItem(tech, idx)).join('')}
+                </div>
+                <div class="practice-actions">
+                    <button class="practice-btn" data-action="add-technique">+ Add Technique</button>
+                    <button class="practice-btn primary" data-action="start-practice">▶ Start Practice</button>
+                    <button class="practice-btn" data-action="reset-sequence">↺ Reset to Default</button>
+                </div>
+            </section>
+        `;
+    }
+
+    renderTechniqueItem(tech, index) {
+        return `
+            <div class="technique-item ${tech.enabled ? '' : 'disabled'}"
+                 draggable="true"
+                 data-index="${index}"
+                 data-id="${tech.id}">
+                <div class="technique-drag-handle">⋮⋮</div>
+                <div class="technique-toggle" data-action="toggle-technique" data-index="${index}">
+                    ${tech.enabled ? '✓' : '○'}
+                </div>
+                <div class="technique-name">${tech.name}</div>
+                <div class="technique-duration"
+                     contenteditable="true"
+                     data-action="edit-duration"
+                     data-index="${index}">${tech.duration}</div>
+                <span class="technique-unit">min</span>
+                <button class="technique-delete" data-action="delete-technique" data-index="${index}">×</button>
+            </div>
+        `;
+    }
+
+    initDragAndDrop() {
+        const list = document.getElementById('technique-list');
+        if (!list) return;
+
+        let draggedItem = null;
+
+        list.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('technique-item')) {
+                draggedItem = e.target;
+                e.target.classList.add('dragging');
+            }
+        });
+
+        list.addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('technique-item')) {
+                e.target.classList.remove('dragging');
+                draggedItem = null;
+            }
+        });
+
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = this.getDragAfterElement(list, e.clientY);
+            if (draggedItem) {
+                if (afterElement == null) {
+                    list.appendChild(draggedItem);
+                } else {
+                    list.insertBefore(draggedItem, afterElement);
+                }
+            }
+        });
+
+        list.addEventListener('drop', () => {
+            // Reorder the sequence based on DOM order
+            const items = list.querySelectorAll('.technique-item');
+            const newSequence = [];
+            items.forEach(item => {
+                const id = parseInt(item.dataset.id);
+                const tech = this.customSequence.find(t => t.id === id);
+                if (tech) newSequence.push(tech);
+            });
+            this.customSequence = newSequence;
+            this.saveCustomSequence();
+            this.updatePracticeTotal();
+        });
+
+        // Duration editing
+        list.addEventListener('blur', (e) => {
+            if (e.target.dataset.action === 'edit-duration') {
+                const index = parseInt(e.target.dataset.index);
+                const newDuration = parseInt(e.target.textContent) || 5;
+                this.customSequence[index].duration = Math.max(1, Math.min(120, newDuration));
+                e.target.textContent = this.customSequence[index].duration;
+                this.saveCustomSequence();
+                this.updatePracticeTotal();
+            }
+        }, true);
+
+        list.addEventListener('keydown', (e) => {
+            if (e.target.dataset.action === 'edit-duration' && e.key === 'Enter') {
+                e.preventDefault();
+                e.target.blur();
+            }
+        });
+    }
+
+    getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.technique-item:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    updatePracticeTotal() {
+        const totalDuration = this.customSequence
+            .filter(t => t.enabled)
+            .reduce((sum, t) => sum + t.duration, 0);
+        const totalEl = document.querySelector('.practice-total');
+        if (totalEl) {
+            totalEl.textContent = `Total: ${totalDuration} min`;
+        }
+    }
+
+    renderFeedbackButton() {
+        return `
+            <div class="feedback-float">
+                <button class="feedback-btn" data-action="open-feedback">
+                    💬 Feedback / Report Issue
+                </button>
+            </div>
+        `;
+    }
+
+    renderFeedbackModal() {
+        return `
+            <div id="feedback-modal" class="modal" style="display: none;">
+                <div class="modal-content feedback-modal">
+                    <button class="modal-close" data-action="close-feedback">×</button>
+                    <h2>📬 Send Feedback</h2>
+                    <p>Report a bug, suggest a feature, or share your experience.</p>
+                    <form id="feedback-form">
+                        <div class="form-group">
+                            <label>Your Name (optional)</label>
+                            <input type="text" id="feedback-name" placeholder="Anonymous">
+                        </div>
+                        <div class="form-group">
+                            <label>Email (optional, for follow-up)</label>
+                            <input type="email" id="feedback-email" placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="feedback-type">
+                                <option value="bug">🐛 Bug Report</option>
+                                <option value="feature">💡 Feature Request</option>
+                                <option value="feedback">💬 General Feedback</option>
+                                <option value="question">❓ Question</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Message *</label>
+                            <textarea id="feedback-message" rows="5" placeholder="Describe your issue or feedback..." required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Send Feedback</button>
+                    </form>
+                    <div id="feedback-status"></div>
+                </div>
             </div>
         `;
     }
