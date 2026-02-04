@@ -1,0 +1,46 @@
+name: Update Events from Siddhanath.org
+
+on:
+  schedule:
+    # Run every 2 weeks on Sunday at 6 AM UTC
+    - cron: '0 6 1,15 * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-events:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run events updater
+        run: node scripts/update-events.js
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet events.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add events.json
+          git commit -m "chore: auto-update events from siddhanath.org
+
+          - Fetched latest events from iCal feed
+          - Updated full moon meditation dates
+
+          [skip ci]"
+          git push

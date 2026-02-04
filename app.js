@@ -3,6 +3,7 @@ class YogaMarathonApp {
     constructor() {
         this.data = null;
         this.sayingsData = null;
+        this.eventsData = null;
         this.currentBelt = 0;
         this.currentSession = 0;
         this.userProgress = this.loadProgress();
@@ -30,20 +31,29 @@ class YogaMarathonApp {
     async loadData() {
         try {
             console.log('Loading data files...');
-            const [marathonResponse, sayingsResponse] = await Promise.all([
+            const [marathonResponse, sayingsResponse, eventsResponse] = await Promise.all([
                 fetch('./siddhanath_yoga_marathon.json'),
-                fetch('./timestamped_sacred_sayings.json')
+                fetch('./timestamped_sacred_sayings.json'),
+                fetch('./events.json').catch(() => null)
             ]);
-            
+
             if (!marathonResponse.ok || !sayingsResponse.ok) {
                 throw new Error('Failed to fetch data files');
             }
-            
+
             this.data = await marathonResponse.json();
             this.sayingsData = await sayingsResponse.json();
+
+            // Load events (optional - don't fail if missing)
+            if (eventsResponse && eventsResponse.ok) {
+                this.eventsData = await eventsResponse.json();
+                console.log('Events loaded:', this.eventsData?.events?.length || 0);
+            }
+
             console.log('Data loaded successfully:', {
                 beltProgression: this.data?.beltProgression?.length,
-                sayingsCategories: Object.keys(this.sayingsData?.categories || {}).length
+                sayingsCategories: Object.keys(this.sayingsData?.categories || {}).length,
+                events: this.eventsData?.events?.length || 0
             });
         } catch (error) {
             console.error('Error loading data:', error);
@@ -150,6 +160,74 @@ class YogaMarathonApp {
             case 'share-progress':
                 this.shareProgress();
                 break;
+            case 'events-list-view':
+                this.switchEventsView('list');
+                break;
+            case 'events-calendar-view':
+                this.switchEventsView('calendar');
+                break;
+            case 'prev-month':
+                this.navigateCalendar(parseInt(element.dataset.month), parseInt(element.dataset.year), -1);
+                break;
+            case 'next-month':
+                this.navigateCalendar(parseInt(element.dataset.month), parseInt(element.dataset.year), 1);
+                break;
+            case 'show-all-events':
+                this.showAllEvents();
+                break;
+        }
+    }
+
+    switchEventsView(view) {
+        const listContainer = document.getElementById('events-list-container');
+        const calendarContainer = document.getElementById('events-calendar-container');
+        const buttons = document.querySelectorAll('.view-btn');
+
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        if (view === 'list') {
+            listContainer.style.display = 'block';
+            calendarContainer.style.display = 'none';
+            document.querySelector('[data-action="events-list-view"]')?.classList.add('active');
+        } else {
+            listContainer.style.display = 'none';
+            calendarContainer.style.display = 'block';
+            document.querySelector('[data-action="events-calendar-view"]')?.classList.add('active');
+        }
+    }
+
+    navigateCalendar(currentMonth, currentYear, direction) {
+        let newMonth = currentMonth + direction;
+        let newYear = currentYear;
+
+        if (newMonth < 0) {
+            newMonth = 11;
+            newYear--;
+        } else if (newMonth > 11) {
+            newMonth = 0;
+            newYear++;
+        }
+
+        const newDate = new Date(newYear, newMonth, 1);
+        const upcomingEvents = this.eventsData.events.filter(e => new Date(e.startDate) >= new Date());
+        const calendarContainer = document.getElementById('events-calendar-container');
+        if (calendarContainer) {
+            calendarContainer.innerHTML = this.renderCalendar(newDate, upcomingEvents);
+        }
+    }
+
+    showAllEvents() {
+        const upcomingEvents = this.eventsData.events
+            .filter(e => new Date(e.startDate) >= new Date())
+            .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+        const listContainer = document.getElementById('events-list-container');
+        if (listContainer) {
+            listContainer.innerHTML = `
+                <div class="events-grid">
+                    ${upcomingEvents.map(event => this.renderEventCard(event)).join('')}
+                </div>
+            `;
         }
     }
 
@@ -210,6 +288,7 @@ class YogaMarathonApp {
         app.innerHTML = `
             <div class="yoga-marathon-app">
                 ${this.renderHeader()}
+                ${this.renderUpcomingEvents()}
                 ${this.renderProgressDashboard()}
                 ${this.renderBeltProgression()}
                 ${this.renderCurrentSession()}
@@ -240,6 +319,157 @@ class YogaMarathonApp {
                     </div>
                 </div>
             </header>
+        `;
+    }
+
+    renderUpcomingEvents() {
+        if (!this.eventsData?.events || this.eventsData.events.length === 0) {
+            return '';
+        }
+
+        // Filter to only show upcoming events
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const upcomingEvents = this.eventsData.events.filter(event => {
+            const eventDate = new Date(event.startDate);
+            return eventDate >= today;
+        }).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+        if (upcomingEvents.length === 0) {
+            return '';
+        }
+
+        // Get current month for calendar
+        const currentMonth = new Date();
+
+        return `
+            <section class="upcoming-events">
+                <div class="events-header">
+                    <h2>🙏 Upcoming Events & Calendar</h2>
+                    <div class="events-view-toggle">
+                        <button class="view-btn active" data-action="events-list-view">📋 List</button>
+                        <button class="view-btn" data-action="events-calendar-view">📅 Calendar</button>
+                    </div>
+                    <a href="https://siddhanath.org/events/" target="_blank" class="view-all-link">
+                        View All on siddhanath.org →
+                    </a>
+                </div>
+                <div id="events-list-container" class="events-view-container">
+                    <div class="events-grid">
+                        ${upcomingEvents.slice(0, 6).map(event => this.renderEventCard(event)).join('')}
+                    </div>
+                    ${upcomingEvents.length > 6 ? `<button class="load-more-btn" data-action="show-all-events">Show All ${upcomingEvents.length} Events</button>` : ''}
+                </div>
+                <div id="events-calendar-container" class="events-view-container" style="display: none;">
+                    ${this.renderCalendar(currentMonth, upcomingEvents)}
+                </div>
+            </section>
+        `;
+    }
+
+    renderCalendar(date, events) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+
+        // Get first day of month and number of days
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Build calendar grid
+        let calendarDays = '';
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        // Day headers
+        calendarDays += dayNames.map(d => `<div class="calendar-day-header">${d}</div>`).join('');
+
+        // Empty cells before first day
+        for (let i = 0; i < firstDay; i++) {
+            calendarDays += '<div class="calendar-day empty"></div>';
+        }
+
+        // Days of month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dayEvents = events.filter(e => e.startDate === dateStr || (e.startDate <= dateStr && e.endDate >= dateStr));
+            const isToday = new Date().toISOString().split('T')[0] === dateStr;
+            const hasFullMoon = dayEvents.some(e => e.type === 'fullmoon');
+            const hasRetreat = dayEvents.some(e => e.type === 'retreat' || e.type === 'pilgrimage');
+
+            let dayClass = 'calendar-day';
+            if (isToday) dayClass += ' today';
+            if (dayEvents.length > 0) dayClass += ' has-events';
+            if (hasFullMoon) dayClass += ' full-moon';
+            if (hasRetreat) dayClass += ' has-retreat';
+
+            const eventDots = dayEvents.map(e => {
+                const icons = { fullmoon: '🌕', retreat: '🧘', pilgrimage: '🏔️', satsang: '🕉️' };
+                return icons[e.type] || '•';
+            }).join('');
+
+            const tooltip = dayEvents.map(e => e.title).join('\n');
+
+            calendarDays += `
+                <div class="${dayClass}" title="${tooltip}">
+                    <span class="day-number">${day}</span>
+                    ${eventDots ? `<span class="event-dots">${eventDots}</span>` : ''}
+                </div>
+            `;
+        }
+
+        return `
+            <div class="calendar-container">
+                <div class="calendar-nav">
+                    <button class="calendar-nav-btn" data-action="prev-month" data-month="${month}" data-year="${year}">◀</button>
+                    <h3 class="calendar-title">${monthNames[month]} ${year}</h3>
+                    <button class="calendar-nav-btn" data-action="next-month" data-month="${month}" data-year="${year}">▶</button>
+                </div>
+                <div class="calendar-grid">
+                    ${calendarDays}
+                </div>
+                <div class="calendar-legend">
+                    <span class="legend-item"><span class="legend-dot">🌕</span> Full Moon - Earth Peace Meditation (7-9 PM)</span>
+                    <span class="legend-item"><span class="legend-dot">🏔️</span> Pilgrimage</span>
+                    <span class="legend-item"><span class="legend-dot">🧘</span> Retreat</span>
+                </div>
+            </div>
+        `;
+    }
+
+    renderEventCard(event) {
+        const startDate = new Date(event.startDate);
+        const endDate = new Date(event.endDate);
+        const options = { month: 'short', day: 'numeric' };
+        const dateRange = startDate.toLocaleDateString('en-US', options) +
+            (event.endDate ? ' - ' + endDate.toLocaleDateString('en-US', options) : '');
+
+        const typeIcons = {
+            pilgrimage: '🏔️',
+            retreat: '🧘',
+            satsang: '🕉️',
+            empowerment: '⚡',
+            community: '👥',
+            fullmoon: '🌕',
+            meditation: '🧘‍♂️'
+        };
+        const icon = typeIcons[event.type] || '📅';
+
+        return `
+            <div class="event-card ${event.featured ? 'featured' : ''}">
+                <div class="event-icon">${icon}</div>
+                <div class="event-content">
+                    <h3 class="event-title">${event.title}</h3>
+                    <div class="event-meta">
+                        <span class="event-date">📅 ${dateRange}, ${startDate.getFullYear()}</span>
+                        <span class="event-location">📍 ${event.location}</span>
+                    </div>
+                    <p class="event-description">${event.description}</p>
+                    <a href="${event.link}" target="_blank" class="event-link">
+                        Learn More & Register →
+                    </a>
+                </div>
+            </div>
         `;
     }
 
