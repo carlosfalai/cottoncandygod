@@ -10,6 +10,17 @@ class YogaMarathonApp {
         this.customSequence = this.loadCustomSequence();
         this.billboardMessages = this.loadBillboardMessages();
         this.billboardIndex = 0;
+        this.sanghaFeed = [];
+        this.sanghaAlerts = [];
+        this.sanghaUser = this.loadSanghaUser();
+        this.apiBaseUrl = location.hostname === 'localhost' ? 'http://localhost:3009' : 'https://siddhanath-ashram-sangha.onrender.com';
+        this.supabaseUrl = 'https://gbxksgxezbljwlnlpkpz.supabase.co';
+        this.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdieGtzZ3hlemJsandsbmxwa3B6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3NTE1ODksImV4cCI6MjA2NDMyNzU4OX0.MCZ9NTKCUe8DLwXz8Cy2-Qr-KYPpq-tn376dpjQ6HxM';
+        this.supabaseClient = null;
+        this.practiceTimer = null;
+        this.practiceState = null;
+        this.practiceLog = this.loadPracticeLog();
+        this.audioCtx = null;
         this.init();
     }
 
@@ -52,6 +63,9 @@ class YogaMarathonApp {
         this.renderApp();
         this.startProgressTracking();
         this.startBillboard();
+        this.loadSanghaData();
+        this.initSupabaseRealtime();
+        this.startAshramClock();
 
         // Hide loading screen
         const loadingScreen = document.querySelector('.loading-screen');
@@ -293,6 +307,27 @@ class YogaMarathonApp {
             case 'reset-billboard-messages':
                 this.resetBillboardMessages();
                 break;
+            case 'sangha-register':
+                this.registerSangha();
+                break;
+            case 'sangha-react':
+                this.reactToPost(element.dataset.postId, element.dataset.type);
+                break;
+            case 'sangha-comment':
+                this.commentOnPost(element.dataset.postId);
+                break;
+            case 'sangha-share-whatsapp':
+                this.shareToWhatsApp(element.dataset.content);
+                break;
+            case 'start-practice-timer':
+                this.startPracticeTimer();
+                break;
+            case 'pause-practice-timer':
+                this.pausePracticeTimer();
+                break;
+            case 'stop-practice-timer':
+                this.stopPracticeTimer();
+                break;
         }
     }
 
@@ -417,9 +452,23 @@ class YogaMarathonApp {
             alert('Please enable at least one technique.');
             return;
         }
-        const totalMinutes = enabledTechniques.reduce((sum, t) => sum + t.duration, 0);
-        const sequence = enabledTechniques.map(t => `${t.name} (${t.duration} min)`).join('\n• ');
-        alert(`🧘 Starting Practice\n\nSequence:\n• ${sequence}\n\nTotal: ${totalMinutes} minutes\n\nOm Shanti 🙏`);
+
+        this.practiceState = {
+            running: true,
+            paused: false,
+            techniques: enabledTechniques,
+            currentTechIdx: 0,
+            secondsLeft: enabledTechniques[0].duration * 60,
+            totalSeconds: enabledTechniques[0].duration * 60,
+            startTime: Date.now(),
+            woodblockCounter: 0
+        };
+
+        this.initAudio();
+        this.playWoodblock('low'); // Start bell
+
+        this.practiceTimer = setInterval(() => this.tickPractice(), 1000);
+        this.rerenderPractice();
     }
 
     resetSequence() {
@@ -625,8 +674,11 @@ class YogaMarathonApp {
             ${this.renderBillboard()}
             <div class="yoga-marathon-app">
                 ${this.renderHeader()}
+                ${this.renderAshramTime()}
+                ${this.renderSanghaAlerts()}
                 ${this.renderUpcomingEvents()}
                 ${this.renderMyPractice()}
+                ${this.renderSangha()}
                 ${this.renderProgressDashboard()}
                 ${this.renderBeltProgression()}
                 ${this.renderCurrentSession()}
@@ -693,6 +745,42 @@ class YogaMarathonApp {
     }
 
     renderMyPractice() {
+        // If practice is running, show timer
+        if (this.practiceState) {
+            const tech = this.practiceState.techniques[this.practiceState.currentTechIdx];
+            const totalDuration = this.practiceState.techniques.reduce((sum, t) => sum + t.duration, 0);
+            return `
+                <section class="my-practice practice-active">
+                    <div class="practice-header">
+                        <h2>🧘 Practice In Progress</h2>
+                        <div class="practice-total">Total: ${totalDuration} min</div>
+                    </div>
+                    <div class="practice-timer-container">
+                        <div class="practice-current-name" id="practice-current-name">${tech.name}</div>
+                        <div class="practice-step-counter" id="practice-step-counter">${this.practiceState.currentTechIdx + 1} / ${this.practiceState.techniques.length}</div>
+                        <div class="practice-timer-display" id="practice-timer-display">
+                            ${String(Math.floor(this.practiceState.secondsLeft / 60)).padStart(2, '0')}:${String(this.practiceState.secondsLeft % 60).padStart(2, '0')}
+                        </div>
+                        <div class="practice-timer-bar">
+                            <div class="practice-timer-progress" id="practice-timer-progress" style="width: 0%"></div>
+                        </div>
+                        <div class="practice-timer-steps">
+                            ${this.practiceState.techniques.map((t, i) => `
+                                <div class="timer-step ${i < this.practiceState.currentTechIdx ? 'done' : ''} ${i === this.practiceState.currentTechIdx ? 'active' : ''}">
+                                    ${i < this.practiceState.currentTechIdx ? '✓' : i === this.practiceState.currentTechIdx ? '▶' : '○'} ${t.name}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="practice-timer-actions">
+                            <button class="practice-btn" data-action="pause-practice-timer">${this.practiceState.paused ? '▶ Resume' : '⏸ Pause'}</button>
+                            <button class="practice-btn" data-action="stop-practice-timer" style="border-color: var(--error-red); color: var(--error-red);">⏹ Stop</button>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        // Normal practice editor
         const totalDuration = this.customSequence
             .filter(t => t.enabled)
             .reduce((sum, t) => sum + t.duration, 0);
@@ -712,6 +800,12 @@ class YogaMarathonApp {
                     <button class="practice-btn primary" data-action="start-practice">▶ Start Practice</button>
                     <button class="practice-btn" data-action="reset-sequence">↺ Reset to Default</button>
                 </div>
+                ${this.practiceLog.length > 0 ? `
+                    <div class="practice-log-summary">
+                        <span>📊 ${this.practiceLog.length} sessions logged</span>
+                        <span>⏱ ${this.practiceLog.reduce((sum, s) => sum + s.duration, 0)} total minutes</span>
+                    </div>
+                ` : ''}
             </section>
         `;
     }
@@ -1429,8 +1523,9 @@ class YogaMarathonApp {
                 </div>
                 <div class="modal-body">
                     <div class="session-video">
-                        <iframe src="https://www.youtube.com/embed/${session.videoId}" 
-                                frameborder="0" allowfullscreen></iframe>
+                        <iframe src="https://www.youtube.com/embed/${session.videoId}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1"
+                                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                     <div class="session-details">
                         <p><strong>Duration:</strong> ${session.analysis?.estimatedMinutes || 10} minutes</p>
@@ -1513,6 +1608,455 @@ class YogaMarathonApp {
             z-index: 10000;
         `;
         document.body.appendChild(promotion);
+    }
+
+    // ============================================
+    // SANGHA COMMUNITY METHODS
+    // ============================================
+
+    loadSanghaUser() {
+        try {
+            const saved = localStorage.getItem('siddhanath-sangha-user');
+            if (saved) return JSON.parse(saved);
+        } catch (e) {
+            console.error('[SANGHA] Error loading user:', e);
+        }
+        return null;
+    }
+
+    saveSanghaUser() {
+        try {
+            localStorage.setItem('siddhanath-sangha-user', JSON.stringify(this.sanghaUser));
+        } catch (e) {
+            console.error('[SANGHA] Error saving user:', e);
+        }
+    }
+
+    async loadSanghaData() {
+        try {
+            const [feedRes, alertsRes] = await Promise.all([
+                fetch(`${this.apiBaseUrl}/api/sangha/feed?limit=20`),
+                fetch(`${this.apiBaseUrl}/api/sangha/alerts`)
+            ]);
+            if (feedRes.ok) {
+                const feedData = await feedRes.json();
+                this.sanghaFeed = feedData.posts || [];
+            }
+            if (alertsRes.ok) {
+                const alertsData = await alertsRes.json();
+                this.sanghaAlerts = alertsData.alerts || [];
+            }
+            this.rerenderSangha();
+        } catch (err) {
+            console.error('[SANGHA] Load error:', err);
+        }
+    }
+
+    async initSupabaseRealtime() {
+        try {
+            // Load Supabase JS client from CDN
+            if (!window.supabase) {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+                document.head.appendChild(script);
+                await new Promise((resolve, reject) => {
+                    script.onload = resolve;
+                    script.onerror = reject;
+                });
+            }
+
+            this.supabaseClient = window.supabase.createClient(this.supabaseUrl, this.supabaseAnonKey);
+
+            // Subscribe to new posts
+            this.supabaseClient
+                .channel('ashram-posts')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ashram_posts' }, (payload) => {
+                    console.log('[SANGHA] New post:', payload.new);
+                    this.loadSanghaData(); // Reload full feed for member info
+                })
+                .subscribe();
+
+            // Subscribe to new alerts
+            this.supabaseClient
+                .channel('ashram-alerts')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ashram_alerts' }, (payload) => {
+                    console.log('[SANGHA] New alert:', payload.new);
+                    this.sanghaAlerts.unshift(payload.new);
+                    this.rerenderSanghaAlerts();
+                })
+                .subscribe();
+
+            console.log('[SANGHA] Realtime subscribed');
+        } catch (err) {
+            console.error('[SANGHA] Realtime init error:', err);
+        }
+    }
+
+    startAshramClock() {
+        const updateClock = () => {
+            const now = new Date();
+            const istEl = document.getElementById('ashram-ist-time');
+            const localEl = document.getElementById('ashram-local-time');
+            if (istEl) {
+                const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+                istEl.textContent = ist.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            }
+            if (localEl) {
+                localEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            }
+        };
+        updateClock();
+        setInterval(updateClock, 1000);
+    }
+
+    renderAshramTime() {
+        return `
+            <div class="ashram-time-bar">
+                <div class="time-item">
+                    <span class="time-label">🇮🇳 Ashram (IST)</span>
+                    <span class="time-value" id="ashram-ist-time">--:--:--</span>
+                </div>
+                <div class="time-divider">|</div>
+                <div class="time-item">
+                    <span class="time-label">📍 Your Time</span>
+                    <span class="time-value" id="ashram-local-time">--:--:--</span>
+                </div>
+            </div>
+        `;
+    }
+
+    renderSanghaAlerts() {
+        const recentAlerts = this.sanghaAlerts.filter(a => {
+            const age = Date.now() - new Date(a.created_at).getTime();
+            return age < 30 * 60 * 1000; // Last 30 minutes
+        });
+
+        if (recentAlerts.length === 0) return '';
+
+        return recentAlerts.map(alert => {
+            const typeEmoji = alert.type === 'food_prayer' ? '🔔' : alert.type === 'satsang' ? '🕉️' : '📣';
+            const isFoodPrayer = alert.type === 'food_prayer';
+            return `
+                <div class="sangha-alert ${isFoodPrayer ? 'food-prayer-alert' : ''}">
+                    <div class="alert-icon">${typeEmoji}</div>
+                    <div class="alert-content">
+                        <div class="alert-title">${alert.title}</div>
+                        <div class="alert-message">${alert.message || ''}</div>
+                        ${isFoodPrayer ? `
+                            <div class="prayer-text-preview">
+                                <img src="https://gbxksgxezbljwlnlpkpz.supabase.co/storage/v1/object/public/ashram-photos/food-prayer/vadani-kaval-gheta.png"
+                                     class="prayer-image" alt="Vadani Kaval Gheta">
+                                <a href="https://www.youtube.com/watch?v=ot79QTRqZyk" target="_blank" class="prayer-video-link">
+                                    🎵 Listen to Prayer
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    renderSangha() {
+        const isRegistered = !!this.sanghaUser;
+
+        return `
+            <section class="sangha-section">
+                <div class="sangha-header">
+                    <h2>🙏 Ashram Sangha</h2>
+                    ${!isRegistered ? `
+                        <button class="action-btn" data-action="sangha-register">Join the Sangha</button>
+                    ` : `
+                        <span class="sangha-user-badge">
+                            ${this.sanghaUser.mode === 'physical' ? '🏕️' : '🌐'} ${this.sanghaUser.name}
+                        </span>
+                    `}
+                </div>
+                <div id="sangha-alerts-container">
+                    ${this.renderSanghaAlerts()}
+                </div>
+                <div class="sangha-feed" id="sangha-feed">
+                    ${this.sanghaFeed.length === 0
+                        ? '<div class="sangha-empty">No posts yet. Join the sangha via Telegram @siddhanath_ashram_bot</div>'
+                        : this.sanghaFeed.map(post => this.renderSanghaPost(post)).join('')
+                    }
+                </div>
+            </section>
+        `;
+    }
+
+    renderSanghaPost(post) {
+        const member = post.member || {};
+        const modeIcon = member.mode === 'physical' ? '🏕️' : '🌐';
+        const timeAgo = this.getTimeAgo(post.created_at);
+        const typeEmoji = { photo: '📸', meditation: '🧘', training: '💪', satsang: '🕉️', food_prayer: '🔔', broadcast: '📣' }[post.type] || '📝';
+
+        return `
+            <div class="sangha-post">
+                <div class="post-header">
+                    <span class="post-author">${modeIcon} ${member.name || 'Sangha Member'}</span>
+                    <span class="post-time">${timeAgo}</span>
+                </div>
+                <div class="post-type-badge">${typeEmoji} ${post.type.replace('_', ' ')}</div>
+                ${post.content ? `<div class="post-content">${this.escapeHtml(post.content)}</div>` : ''}
+                ${post.photo_url ? `<img src="${post.photo_url}" class="post-photo" alt="Sangha photo" loading="lazy">` : ''}
+                ${post.video_url ? `
+                    <a href="${post.video_url}" target="_blank" class="post-video-link">🎬 Watch Video</a>
+                ` : ''}
+                <div class="post-actions">
+                    <button class="react-btn" data-action="sangha-react" data-post-id="${post.id}" data-type="heart">
+                        ❤️ ${post.reaction_count || 0}
+                    </button>
+                    <button class="react-btn" data-action="sangha-react" data-post-id="${post.id}" data-type="prayer">
+                        🙏
+                    </button>
+                    <button class="react-btn" data-action="sangha-comment" data-post-id="${post.id}">
+                        💬 ${post.comment_count || 0}
+                    </button>
+                    <button class="react-btn" data-action="sangha-share-whatsapp" data-content="${encodeURIComponent(post.content || 'Hari Om from the Ashram!')}">
+                        📲 Share
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    getTimeAgo(dateStr) {
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'just now';
+        if (mins < 60) return `${mins}m ago`;
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+    }
+
+    rerenderSangha() {
+        const feed = document.getElementById('sangha-feed');
+        if (feed) {
+            feed.innerHTML = this.sanghaFeed.length === 0
+                ? '<div class="sangha-empty">No posts yet. Join the sangha via Telegram @siddhanath_ashram_bot</div>'
+                : this.sanghaFeed.map(post => this.renderSanghaPost(post)).join('');
+        }
+    }
+
+    rerenderSanghaAlerts() {
+        const container = document.getElementById('sangha-alerts-container');
+        if (container) {
+            container.innerHTML = this.renderSanghaAlerts();
+        }
+    }
+
+    async registerSangha() {
+        const name = prompt('Enter your name (spiritual or given):');
+        if (!name) return;
+
+        const mode = confirm('Are you physically at the ashram?\n\nOK = Physical\nCancel = Remote') ? 'physical' : 'remote';
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/api/sangha/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, mode })
+            });
+
+            if (!response.ok) throw new Error('Registration failed');
+
+            const data = await response.json();
+            this.sanghaUser = { id: data.member.id, name: data.member.name, mode: data.member.mode };
+            this.saveSanghaUser();
+            this.rerenderSangha();
+        } catch (err) {
+            console.error('[SANGHA] Register error:', err);
+            alert('Registration failed. Please try again.');
+        }
+    }
+
+    async reactToPost(postId, type) {
+        if (!this.sanghaUser) {
+            alert('Please join the sangha first.');
+            return;
+        }
+        try {
+            await fetch(`${this.apiBaseUrl}/api/sangha/react`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ member_id: this.sanghaUser.id, post_id: postId, type })
+            });
+            this.loadSanghaData();
+        } catch (err) {
+            console.error('[SANGHA] React error:', err);
+        }
+    }
+
+    async commentOnPost(postId) {
+        if (!this.sanghaUser) {
+            alert('Please join the sangha first.');
+            return;
+        }
+        const content = prompt('Your comment:');
+        if (!content) return;
+
+        try {
+            await fetch(`${this.apiBaseUrl}/api/sangha/comment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ member_id: this.sanghaUser.id, post_id: postId, content })
+            });
+            this.loadSanghaData();
+        } catch (err) {
+            console.error('[SANGHA] Comment error:', err);
+        }
+    }
+
+    shareToWhatsApp(content) {
+        window.open(`https://wa.me/?text=${content}`, '_blank');
+    }
+
+    // ============================================
+    // PRACTICE TIMER METHODS
+    // ============================================
+
+    loadPracticeLog() {
+        try {
+            return JSON.parse(localStorage.getItem('siddhanath-practice-log') || '[]');
+        } catch (e) { return []; }
+    }
+
+    savePracticeLog() {
+        localStorage.setItem('siddhanath-practice-log', JSON.stringify(this.practiceLog));
+    }
+
+    initAudio() {
+        if (!this.audioCtx) {
+            this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    playWoodblock(pitch = 'high') {
+        try {
+            this.initAudio();
+            const osc = this.audioCtx.createOscillator();
+            const gain = this.audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(this.audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.value = pitch === 'high' ? 800 : 400;
+            gain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.15);
+            osc.start(this.audioCtx.currentTime);
+            osc.stop(this.audioCtx.currentTime + 0.15);
+        } catch (e) { console.error('Audio error:', e); }
+    }
+
+    tickPractice() {
+        if (!this.practiceState || this.practiceState.paused) return;
+
+        this.practiceState.secondsLeft--;
+        this.practiceState.woodblockCounter++;
+
+        // Woodblock every 15 seconds
+        if (this.practiceState.woodblockCounter % 15 === 0) {
+            this.playWoodblock('high');
+        }
+
+        // Update display
+        this.updateTimerDisplay();
+
+        if (this.practiceState.secondsLeft <= 0) {
+            // Move to next technique
+            this.practiceState.currentTechIdx++;
+
+            if (this.practiceState.currentTechIdx >= this.practiceState.techniques.length) {
+                // Practice complete!
+                this.completePractice();
+                return;
+            }
+
+            // Start next technique
+            const next = this.practiceState.techniques[this.practiceState.currentTechIdx];
+            this.practiceState.secondsLeft = next.duration * 60;
+            this.practiceState.totalSeconds = next.duration * 60;
+            this.practiceState.woodblockCounter = 0;
+            this.playWoodblock('low'); // Transition bell
+            this.rerenderPractice();
+        }
+    }
+
+    updateTimerDisplay() {
+        const el = document.getElementById('practice-timer-display');
+        if (!el || !this.practiceState) return;
+
+        const mins = Math.floor(this.practiceState.secondsLeft / 60);
+        const secs = this.practiceState.secondsLeft % 60;
+        el.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        // Update progress bar
+        const progressEl = document.getElementById('practice-timer-progress');
+        if (progressEl) {
+            const pct = ((this.practiceState.totalSeconds - this.practiceState.secondsLeft) / this.practiceState.totalSeconds) * 100;
+            progressEl.style.width = `${pct}%`;
+        }
+
+        // Update technique name
+        const nameEl = document.getElementById('practice-current-name');
+        if (nameEl) {
+            nameEl.textContent = this.practiceState.techniques[this.practiceState.currentTechIdx].name;
+        }
+
+        // Update step counter
+        const stepEl = document.getElementById('practice-step-counter');
+        if (stepEl) {
+            stepEl.textContent = `${this.practiceState.currentTechIdx + 1} / ${this.practiceState.techniques.length}`;
+        }
+    }
+
+    pausePracticeTimer() {
+        if (this.practiceState) {
+            this.practiceState.paused = !this.practiceState.paused;
+            const btn = document.querySelector('[data-action="pause-practice-timer"]');
+            if (btn) btn.textContent = this.practiceState.paused ? '▶ Resume' : '⏸ Pause';
+        }
+    }
+
+    stopPracticeTimer() {
+        if (this.practiceTimer) {
+            clearInterval(this.practiceTimer);
+            this.practiceTimer = null;
+        }
+        this.practiceState = null;
+        this.rerenderPractice();
+    }
+
+    completePractice() {
+        clearInterval(this.practiceTimer);
+        this.practiceTimer = null;
+
+        const duration = Math.round((Date.now() - this.practiceState.startTime) / 60000);
+        const techniques = this.practiceState.techniques.map(t => t.name);
+
+        this.practiceLog.push({
+            date: new Date().toISOString(),
+            duration,
+            techniques,
+            completed: true
+        });
+        this.savePracticeLog();
+
+        this.practiceState = null;
+        this.playWoodblock('low');
+        setTimeout(() => this.playWoodblock('high'), 300);
+        setTimeout(() => this.playWoodblock('low'), 600);
+
+        this.rerenderPractice();
+        alert(`🧘 Practice Complete!\n\nDuration: ${duration} minutes\nTechniques: ${techniques.join(', ')}\n\nHari Om 🙏`);
     }
 
     findSession(sessionId) {
