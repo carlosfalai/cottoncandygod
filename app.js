@@ -2131,7 +2131,7 @@ class YogaMarathonApp {
 
                         <div class="help-section">
                             <h3>Hafiz Gurunath System</h3>
-                            <p>You advance through 9 spiritual levels — from Shishya (Initiate) to Gurunath (Enlightened) — by watching and completing guided yoga sessions. Each level has its own set of videos. Complete all sessions in a level to unlock the next one. Scroll down to see your progress and click any session to start.</p>
+                            <p>You advance through 9 spiritual levels — from Shishya (Initiate) to Paramahansa (Liberated) — by watching and completing guided yoga sessions. Each level has its own set of videos. Complete all sessions in a level to unlock the next one. Scroll down to see your progress and click any session to start.</p>
                         </div>
 
                         <div class="help-section">
