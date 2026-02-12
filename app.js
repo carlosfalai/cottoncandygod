@@ -2126,12 +2126,12 @@ class YogaMarathonApp {
                     <div class="help-sections">
                         <div class="help-section">
                             <h3>What is this app?</h3>
-                            <p>This Chrome extension is a companion for practitioners of Kriya Yoga as taught by Yogiraj Siddhanath. It guides you through 280 video sessions organized in 9 Hafiz levels, helps you build a daily practice, and connects you with the global sangha (community).</p>
+                            <p>This Chrome extension is a companion for practitioners of Kriya Yoga as taught by Yogiraj Siddhanath. It guides you through 280 video sessions organized in 8 groups, helps you build a daily practice, and connects you with the global sangha (community).</p>
                         </div>
 
                         <div class="help-section">
                             <h3>Hafiz Gurunath System</h3>
-                            <p>You advance through 9 spiritual levels — from Shishya (Initiate) to Paramahansa (Liberated) — by watching and completing guided yoga sessions. Each level has its own set of videos. Complete all sessions in a level to unlock the next one. Scroll down to see your progress and click any session to start.</p>
+                            <p>You progress through 8 groups of guided yoga sessions by watching and completing them. Complete all sessions in a group to unlock the next one. Scroll down to see your progress and click any session to start.</p>
                         </div>
 
                         <div class="help-section">
@@ -2219,7 +2219,7 @@ class YogaMarathonApp {
                     <div id="ai-chat-body" class="ai-chat-body">
                         <div id="ai-chat-messages" class="ai-chat-messages">
                             <div class="ai-message assistant">
-                                <div class="ai-message-bubble">Hari Om! I'm Guru AI, your guide for this app. Ask me anything about the Hafiz levels, practice timer, events, or the sangha. I'm here to help!</div>
+                                <div class="ai-message-bubble">Hari Om! I'm Guru AI, your guide for this app. Ask me anything about the practice sessions, timer, events, or the sangha. I'm here to help!</div>
                             </div>
                         </div>
                     </div>
@@ -2239,7 +2239,7 @@ class YogaMarathonApp {
                         </div>
                         <div class="form-group">
                             <label>What happened?</label>
-                            <textarea id="report-description" rows="4" placeholder="Describe the issue... e.g. 'The practice timer doesn't make a sound' or 'I can't see my Hafiz progress'"></textarea>
+                            <textarea id="report-description" rows="4" placeholder="Describe the issue... e.g. 'The practice timer doesn't make a sound' or 'I can't see my progress'"></textarea>
                         </div>
                         <div class="report-actions">
                             <button data-action="switch-to-chat" class="practice-btn">Back to Chat</button>
