@@ -57,6 +57,17 @@ function mountApiRoutes(app, supabase) {
     legacyHeaders: false
   });
 
+  const generalLimiter = rateLimit({
+    windowMs: 60 * 1000,      // 1 minute
+    max: 60,                   // 60 requests per minute per IP
+    message: { error: 'Too many requests. Please slow down.' },
+    standardHeaders: true,
+    legacyHeaders: false
+  });
+
+  // Apply general rate limit to all /api routes
+  app.use('/api', generalLimiter);
+
   // ─── POST /api/ai/chat ──────────────────────────────────
   // AI troubleshoot assistant using Claude Haiku
   app.post('/api/ai/chat', aiChatLimiter, async (req, res) => {
@@ -185,6 +196,7 @@ function mountApiRoutes(app, supabase) {
           await fetch(workerUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(10000),
             body: JSON.stringify({
               name: ticket.user_name,
               email: ticket.user_email,

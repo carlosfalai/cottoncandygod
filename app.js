@@ -121,7 +121,8 @@ class YogaMarathonApp {
         if (!billboard) return;
 
         const message = this.billboardMessages[this.billboardIndex % this.billboardMessages.length];
-        billboard.innerHTML = `<span class="billboard-message billboard-${message.type}">${message.text}</span>`;
+        const safeType = ['info', 'alert', 'promo', 'custom'].includes(message.type) ? message.type : 'info';
+        billboard.innerHTML = `<span class="billboard-message billboard-${safeType}">${this.escapeHtml(message.text)}</span>`;
         billboard.classList.add('billboard-animate');
         setTimeout(() => billboard.classList.remove('billboard-animate'), 500);
         this.billboardIndex++;
@@ -1111,7 +1112,7 @@ class YogaMarathonApp {
                 return icons[e.type] || '•';
             }).join('');
 
-            const tooltip = dayEvents.map(e => e.title).join('\n');
+            const tooltip = dayEvents.map(e => e.title).join('\n').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
             calendarDays += `
                 <div class="${dayClass}" title="${tooltip}">
@@ -1338,16 +1339,20 @@ class YogaMarathonApp {
     renderSayingCard(saying) {
         const isFavorite = this.userProgress.favoriteSayings.includes(saying.quote);
 
+        const safeQuote = this.escapeHtml(saying.quote);
+        const safeTheme = this.escapeHtml(saying.theme || 'Sacred Teaching');
+        const safeVideoTitle = this.escapeHtml(saying.videoTitle || "Gurunath's Teachings");
+
         return `
-            <div class="saying-card" data-saying-id="${saying.quote}">
+            <div class="saying-card" data-saying-id="${safeQuote}">
                 <div class="saying-content">
-                    <blockquote class="saying-quote">"${saying.quote}"</blockquote>
+                    <blockquote class="saying-quote">"${safeQuote}"</blockquote>
                     <div class="saying-meta">
                         <div class="saying-source">
-                            <strong>${saying.theme || 'Sacred Teaching'}</strong>
-                            <br><small>${saying.videoTitle || 'Gurunath\'s Teachings'}</small>
+                            <strong>${safeTheme}</strong>
+                            <br><small>${safeVideoTitle}</small>
                         </div>
-                        <button data-action="toggle-favorites" data-item-id="${saying.quote}" 
+                        <button data-action="toggle-favorites" data-item-id="${safeQuote}"
                                 class="favorite-btn ${isFavorite ? 'favorited' : ''}">
                             ${isFavorite ? '❤️' : '🤍'}
                         </button>
@@ -1828,14 +1833,14 @@ class YogaMarathonApp {
         return `
             <div class="sangha-post">
                 <div class="post-header">
-                    <span class="post-author">${modeIcon} ${member.name || 'Sangha Member'}</span>
+                    <span class="post-author">${modeIcon} ${this.escapeHtml(member.name || 'Sangha Member')}</span>
                     <span class="post-time">${timeAgo}</span>
                 </div>
                 <div class="post-type-badge">${typeEmoji} ${post.type.replace('_', ' ')}</div>
                 ${post.content ? `<div class="post-content">${this.escapeHtml(post.content)}</div>` : ''}
-                ${post.photo_url ? `<img src="${post.photo_url}" class="post-photo" alt="Sangha photo" loading="lazy">` : ''}
-                ${post.video_url ? `
-                    <a href="${post.video_url}" target="_blank" class="post-video-link">🎬 Watch Video</a>
+                ${post.photo_url && /^https?:\/\//.test(post.photo_url) ? `<img src="${this.escapeHtml(post.photo_url)}" class="post-photo" alt="Sangha photo" loading="lazy">` : ''}
+                ${post.video_url && /^https?:\/\//.test(post.video_url) ? `
+                    <a href="${this.escapeHtml(post.video_url)}" target="_blank" rel="noopener" class="post-video-link">🎬 Watch Video</a>
                 ` : ''}
                 <div class="post-actions">
                     <button class="react-btn" data-action="sangha-react" data-post-id="${post.id}" data-type="heart">
