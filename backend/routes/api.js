@@ -9,7 +9,205 @@
  * @param {import('express').Application} app - Express app
  * @param {import('@supabase/supabase-js').SupabaseClient} supabase - Supabase client
  */
+// System prompt for the AI assistant — knows the app inside and out
+const AI_SYSTEM_PROMPT = `You are Guru AI, a friendly spiritual assistant for the Siddhanath Kriya Yoga Chrome extension app.
+
+You help users understand and use the app. You speak warmly, with a yogic touch (use "Hari Om" or "Namaste" occasionally).
+Keep answers SHORT (2-4 sentences max). Use simple language.
+
+THE APP HAS THESE FEATURES:
+1. **Belt Progression** — 9 belt levels (like martial arts) with 280 guided YouTube video sessions. Users watch videos, mark complete, and advance through belts.
+2. **Practice Timer** — Customizable Kriya Yoga practice sequence (Omkar Kriya, Shiva Shakti Kriya, Mahamudra, Paravastha, Nabho Kriya, Jyoti Mudra). Has countdown timer with woodblock sound alerts every 15 seconds. Drag to reorder, edit durations, add/remove techniques.
+3. **Sacred Sayings** — 4,941 spiritual quotes from Yogiraj Siddhanath searchable by category.
+4. **Events Calendar** — Upcoming retreats, pilgrimages, full moon meditations from siddhanath.org. List + calendar view.
+5. **Ashram Sangha** — Live community feed. Join via name, see posts from Telegram bot community, react with heart/prayer, comment, share to WhatsApp.
+6. **Ashram Clock** — Shows India Standard Time (IST) and your local time.
+7. **Billboard** — Scrolling messages at top, editable by user.
+8. **Feedback** — Send bug reports or suggestions.
+
+COMMON QUESTIONS:
+- "How do I start?" → Click a belt card, then click "Start Session" to watch the video. Mark complete when done.
+- "What are belts?" → Like martial arts belts. Complete all sessions in a belt to unlock the next one.
+- "How does the timer work?" → Go to "My Practice Sequence", customize your techniques, click "Start Practice". It guides you through each with a countdown and woodblock sounds.
+- "Can I change the practice order?" → Yes! Drag techniques to reorder, click durations to edit, toggle on/off, or add new ones.
+- "What is Sangha?" → The community section. Join by entering your name, then see posts from the ashram Telegram group.
+- "Where are events?" → Scroll to "Upcoming Events". Switch between list and calendar views. Events come from siddhanath.org.
+
+If someone reports an issue/error, be empathetic and tell them to use the "Report Issue" button so the developer gets notified.
+If you don't know something, say so honestly.`;
+
+const rateLimit = require('express-rate-limit');
+
 function mountApiRoutes(app, supabase) {
+
+  // ─── Rate limiters ────────────────────────────────────────
+  const aiChatLimiter = rateLimit({
+    windowMs: 60 * 1000,    // 1 minute
+    max: 10,                // 10 requests per minute
+    message: { error: 'Too many requests. Please wait a moment.' },
+    standardHeaders: true,
+    legacyHeaders: false
+  });
+
+  const reportLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5,                    // 5 reports per 15 min
+    message: { error: 'Too many reports. Please wait before submitting again.' },
+    standardHeaders: true,
+    legacyHeaders: false
+  });
+
+  // ─── POST /api/ai/chat ──────────────────────────────────
+  // AI troubleshoot assistant using Claude Haiku
+  app.post('/api/ai/chat', aiChatLimiter, async (req, res) => {
+    try {
+      const { message, history } = req.body;
+      if (!message) return res.status(400).json({ error: 'message required' });
+      if (typeof message !== 'string' || message.length > 2000) {
+        return res.status(400).json({ error: 'Message too long (max 2000 characters)' });
+      }
+
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) return res.status(500).json({ error: 'AI not configured' });
+
+      // Build messages from history — only allow valid roles
+      const messages = [];
+      if (history && Array.isArray(history)) {
+        for (const h of history.slice(-10)) {
+          if (h.role === 'user' || h.role === 'assistant') {
+            messages.push({ role: h.role, content: String(h.content).slice(0, 2000) });
+          }
+        }
+      }
+      messages.push({ role: 'user', content: message });
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        signal: AbortSignal.timeout(15000),
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 500,
+          system: AI_SYSTEM_PROMPT,
+          messages
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error('[AI] API error:', errText);
+        return res.status(500).json({ error: 'AI service unavailable' });
+      }
+
+      const data = await response.json();
+      const reply = data.content?.[0]?.text || 'I am unable to respond right now. Please try again.';
+
+      res.json({ reply });
+    } catch (err) {
+      if (err.name === 'TimeoutError') {
+        return res.status(504).json({ error: 'AI service timed out. Please try again.' });
+      }
+      console.error('[AI] Chat error:', err);
+      res.status(500).json({ error: 'AI service error' });
+    }
+  });
+
+  // ─── POST /api/support/report ───────────────────────────
+  // User reports an issue. AI summarizes, stores in DB, sends notifications.
+  app.post('/api/support/report', reportLimiter, async (req, res) => {
+    try {
+      const { description, user_name, user_email, category } = req.body;
+      if (!description) return res.status(400).json({ error: 'description required' });
+      if (typeof description !== 'string' || description.length > 5000) {
+        return res.status(400).json({ error: 'Description too long (max 5000 characters)' });
+      }
+
+      let aiSummary = '';
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+
+      // Ask Claude Haiku to summarize and categorize the issue
+      if (apiKey) {
+        try {
+          const aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+              'anthropic-version': '2023-06-01'
+            },
+            signal: AbortSignal.timeout(15000),
+            body: JSON.stringify({
+              model: 'claude-haiku-4-5-20251001',
+              max_tokens: 300,
+              system: 'You are a support ticket analyzer. Summarize the user issue in 1-2 sentences. Categorize as: bug, feature_request, confusion, or other. Format: CATEGORY: [category]\nSUMMARY: [summary]',
+              messages: [{ role: 'user', content: description }]
+            })
+          });
+          if (aiRes.ok) {
+            const aiData = await aiRes.json();
+            aiSummary = aiData.content?.[0]?.text || '';
+          }
+        } catch (e) {
+          console.error('[SUPPORT] AI summary error:', e.message);
+        }
+      }
+
+      // Store in Supabase
+      const ticket = {
+        description: description.trim().slice(0, 5000),
+        ai_summary: aiSummary,
+        user_name: (user_name || 'Anonymous').trim().slice(0, 100),
+        user_email: (user_email || '').trim().slice(0, 200),
+        category: category || 'general',
+        status: 'open',
+        created_at: new Date().toISOString()
+      };
+
+      const { data: saved, error: dbError } = await supabase
+        .from('ashram_support_tickets')
+        .insert(ticket)
+        .select()
+        .single();
+
+      if (dbError) {
+        console.error('[SUPPORT] DB error:', dbError.message);
+        // Continue even if DB fails — still send notification
+      }
+
+      // Send SMS notification via Cloudflare Worker
+      const workerUrl = process.env.FEEDBACK_WORKER_URL;
+      if (workerUrl) {
+        try {
+          await fetch(workerUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: ticket.user_name,
+              email: ticket.user_email,
+              type: 'issue_report',
+              message: `ISSUE REPORT\n${aiSummary || description.slice(0, 250)}`
+            })
+          });
+        } catch (e) {
+          console.error('[SUPPORT] SMS notification error:', e.message);
+        }
+      }
+
+      res.json({
+        success: true,
+        ticket_id: saved?.id || null,
+        ai_summary: aiSummary,
+        message: 'Your issue has been reported. We\'ll look into it!'
+      });
+    } catch (err) {
+      console.error('[SUPPORT] Report error:', err);
+      res.status(500).json({ error: 'Failed to submit report' });
+    }
+  });
 
   // ─── GET /api/sangha/feed ─────────────────────────────────
   // Returns posts with member info, reaction count, comment count.

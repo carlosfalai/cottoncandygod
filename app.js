@@ -21,6 +21,9 @@ class YogaMarathonApp {
         this.practiceState = null;
         this.practiceLog = this.loadPracticeLog();
         this.audioCtx = null;
+        // AI Chat state
+        this.aiChatHistory = [];
+        this.aiChatMode = 'chat'; // 'chat' or 'report'
         this.init();
     }
 
@@ -327,6 +330,30 @@ class YogaMarathonApp {
                 break;
             case 'stop-practice-timer':
                 this.stopPracticeTimer();
+                break;
+            case 'open-help':
+                this.openHelpModal();
+                break;
+            case 'close-help':
+                this.closeHelpModal();
+                break;
+            case 'open-ai-chat':
+                this.openAIChat();
+                break;
+            case 'close-ai-chat':
+                this.closeAIChat();
+                break;
+            case 'send-ai-message':
+                this.sendAIMessage();
+                break;
+            case 'switch-to-report':
+                this.switchToReportMode();
+                break;
+            case 'switch-to-chat':
+                this.switchToChatMode();
+                break;
+            case 'submit-report':
+                this.submitReport();
                 break;
         }
     }
@@ -688,9 +715,13 @@ class YogaMarathonApp {
             </div>
             ${this.renderFeedbackModal()}
             ${this.renderBillboardEditorModal()}
+            ${this.renderHelpModal()}
+            ${this.renderAIChatModal()}
+            ${this.renderAIChatButton()}
         `;
         this.initDragAndDrop();
         this.initBillboardEditor();
+        this.initAIChatKeyboard();
     }
 
     renderBillboard() {
@@ -979,6 +1010,9 @@ class YogaMarathonApp {
                         </div>
                     </div>
                     <div class="header-actions">
+                        <button data-action="open-help" class="action-btn help-btn" title="How to use this app">
+                            ? Help
+                        </button>
                         <button data-action="search-sayings" class="action-btn">
                             🔍 Search Sayings
                         </button>
@@ -2071,6 +2105,319 @@ class YogaMarathonApp {
         // Auto-save progress every 30 seconds
         setInterval(() => this.saveProgress(), 30000);
     }
+
+    // ═══════════════════════════════════════════════
+    // HELP MODAL
+    // ═══════════════════════════════════════════════
+
+    renderHelpModal() {
+        return `
+            <div id="help-modal" class="modal" style="display: none;">
+                <div class="modal-content help-modal-content">
+                    <button class="modal-close" data-action="close-help">&times;</button>
+                    <h2 class="help-title">Welcome to Siddhanath Kriya Yoga</h2>
+                    <p class="help-subtitle">Your personal spiritual practice companion</p>
+
+                    <div class="help-sections">
+                        <div class="help-section">
+                            <h3>What is this app?</h3>
+                            <p>This Chrome extension is a companion for practitioners of Kriya Yoga as taught by Yogiraj Siddhanath. It guides you through 280 video sessions organized in 9 belt levels, helps you build a daily practice, and connects you with the global sangha (community).</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h3>Belt Progression System</h3>
+                            <p>Like martial arts belts, you advance through 9 levels by watching and completing guided yoga sessions. Each belt has its own set of videos. Complete all sessions in a belt to unlock the next one. Scroll down to see your belts and click any session to start.</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h3>Practice Timer</h3>
+                            <p>The "My Practice Sequence" section lets you build a custom Kriya Yoga routine. Add techniques like Omkar Kriya, Shiva Shakti Kriya, and more. Set durations, drag to reorder, then click "Start Practice" for a guided countdown with gentle woodblock sound alerts every 15 seconds.</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h3>Sacred Sayings</h3>
+                            <p>Browse 4,941 spiritual quotes from Yogiraj Siddhanath, extracted from his video teachings. Search by keyword or filter by category. Click the heart to save favorites.</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h3>Events Calendar</h3>
+                            <p>Stay updated with retreats, pilgrimages, full moon meditations, and empowerments. Events are pulled directly from siddhanath.org. Toggle between list and calendar views.</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h3>Ashram Sangha (Community)</h3>
+                            <p>Join the global community! Enter your name and choose physical or remote mode. See posts from the ashram Telegram group, react with hearts or prayers, comment, and share to WhatsApp.</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h3>Billboard</h3>
+                            <p>The scrolling text at the top shows quotes, tips, and event reminders. Click the pencil icon to customize your own messages.</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h3>Need more help?</h3>
+                            <p>Click the "Ask Guru AI" button at the bottom-right corner to chat with our AI assistant. It knows the app inside and out and can answer any question. You can also report issues there.</p>
+                        </div>
+                    </div>
+
+                    <div class="help-footer">
+                        <button data-action="close-help" class="primary-btn">Got it, let's practice!</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    openHelpModal() {
+        const modal = document.getElementById('help-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    closeHelpModal() {
+        const modal = document.getElementById('help-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    // ═══════════════════════════════════════════════
+    // AI CHAT + ERROR REPORTER
+    // ═══════════════════════════════════════════════
+
+    renderAIChatButton() {
+        return `
+            <button class="ai-chat-fab" data-action="open-ai-chat" title="Ask Guru AI for help">
+                <span class="fab-icon">🙏</span>
+                <span class="fab-label">Ask Guru AI</span>
+            </button>
+        `;
+    }
+
+    renderAIChatModal() {
+        return `
+            <div id="ai-chat-modal" class="modal" style="display: none;">
+                <div class="modal-content ai-chat-modal-content">
+                    <div class="ai-chat-header">
+                        <div class="ai-chat-title">
+                            <span class="ai-avatar">🙏</span>
+                            <div>
+                                <h3>Guru AI</h3>
+                                <span class="ai-status">Your yoga app assistant</span>
+                            </div>
+                        </div>
+                        <div class="ai-chat-header-actions">
+                            <button class="ai-mode-btn ${this.aiChatMode === 'report' ? 'active' : ''}" data-action="switch-to-report" title="Report an issue">
+                                Report Issue
+                            </button>
+                            <button class="modal-close" data-action="close-ai-chat">&times;</button>
+                        </div>
+                    </div>
+
+                    <div id="ai-chat-body" class="ai-chat-body">
+                        <div id="ai-chat-messages" class="ai-chat-messages">
+                            <div class="ai-message assistant">
+                                <div class="ai-message-bubble">Hari Om! I'm Guru AI, your guide for this app. Ask me anything about belts, practice timer, events, or the sangha. I'm here to help!</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="ai-report-form" class="ai-report-form" style="display: none;">
+                        <div class="report-intro">
+                            <h4>Report an Issue</h4>
+                            <p>Describe what's not working. Our AI will summarize and send it to the developer.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Your Name (optional)</label>
+                            <input type="text" id="report-name" placeholder="Anonymous" />
+                        </div>
+                        <div class="form-group">
+                            <label>Your Email (optional, for follow-up)</label>
+                            <input type="email" id="report-email" placeholder="you@example.com" />
+                        </div>
+                        <div class="form-group">
+                            <label>What happened?</label>
+                            <textarea id="report-description" rows="4" placeholder="Describe the issue... e.g. 'The practice timer doesn't make a sound' or 'I can't see my belt progress'"></textarea>
+                        </div>
+                        <div class="report-actions">
+                            <button data-action="switch-to-chat" class="practice-btn">Back to Chat</button>
+                            <button data-action="submit-report" class="practice-btn primary">Send Report</button>
+                        </div>
+                        <div id="report-status" class="report-status"></div>
+                    </div>
+
+                    <div id="ai-chat-input-area" class="ai-chat-input-area">
+                        <input type="text" id="ai-chat-input" placeholder="Type a question..." autocomplete="off" />
+                        <button data-action="send-ai-message" class="ai-send-btn">Send</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    initAIChatKeyboard() {
+        const input = document.getElementById('ai-chat-input');
+        if (input && !input.dataset.listenerAdded) {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendAIMessage();
+                }
+            });
+            input.dataset.listenerAdded = 'true';
+        }
+    }
+
+    openAIChat() {
+        const modal = document.getElementById('ai-chat-modal');
+        if (modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                const input = document.getElementById('ai-chat-input');
+                if (input) input.focus();
+            }, 100);
+        }
+    }
+
+    closeAIChat() {
+        const modal = document.getElementById('ai-chat-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    switchToReportMode() {
+        this.aiChatMode = 'report';
+        const chatBody = document.getElementById('ai-chat-body');
+        const reportForm = document.getElementById('ai-report-form');
+        const inputArea = document.getElementById('ai-chat-input-area');
+        const modeBtn = document.querySelector('.ai-mode-btn');
+        if (chatBody) chatBody.style.display = 'none';
+        if (reportForm) reportForm.style.display = 'block';
+        if (inputArea) inputArea.style.display = 'none';
+        if (modeBtn) { modeBtn.classList.add('active'); }
+    }
+
+    switchToChatMode() {
+        this.aiChatMode = 'chat';
+        const chatBody = document.getElementById('ai-chat-body');
+        const reportForm = document.getElementById('ai-report-form');
+        const inputArea = document.getElementById('ai-chat-input-area');
+        const modeBtn = document.querySelector('.ai-mode-btn');
+        if (chatBody) chatBody.style.display = 'block';
+        if (reportForm) reportForm.style.display = 'none';
+        if (inputArea) inputArea.style.display = 'flex';
+        if (modeBtn) { modeBtn.classList.remove('active'); modeBtn.textContent = 'Report Issue'; }
+    }
+
+    async sendAIMessage() {
+        const input = document.getElementById('ai-chat-input');
+        if (!input) return;
+        const message = input.value.trim();
+        if (!message) return;
+
+        input.value = '';
+        input.disabled = true;
+        const sendBtn = document.querySelector('[data-action="send-ai-message"]');
+        if (sendBtn) sendBtn.disabled = true;
+
+        // Add user message to chat
+        const messagesEl = document.getElementById('ai-chat-messages');
+        messagesEl.innerHTML += `<div class="ai-message user"><div class="ai-message-bubble">${this.escapeHtml(message)}</div></div>`;
+
+        // Add typing indicator
+        messagesEl.innerHTML += `<div class="ai-message assistant typing" id="ai-typing"><div class="ai-message-bubble">Thinking...</div></div>`;
+        setTimeout(() => { messagesEl.scrollTop = messagesEl.scrollHeight; }, 0);
+
+        // Add to history
+        this.aiChatHistory.push({ role: 'user', content: message });
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/api/ai/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message,
+                    history: this.aiChatHistory.slice(-10)
+                })
+            });
+
+            // Remove typing indicator
+            const typing = document.getElementById('ai-typing');
+            if (typing) typing.remove();
+
+            if (!response.ok) {
+                throw new Error('AI service unavailable');
+            }
+
+            const data = await response.json();
+            const reply = data.reply || 'I could not generate a response. Please try again.';
+
+            // Add AI response
+            this.aiChatHistory.push({ role: 'assistant', content: reply });
+            messagesEl.innerHTML += `<div class="ai-message assistant"><div class="ai-message-bubble">${this.escapeHtml(reply)}</div></div>`;
+
+        } catch (err) {
+            // Remove typing indicator
+            const typing = document.getElementById('ai-typing');
+            if (typing) typing.remove();
+
+            messagesEl.innerHTML += `<div class="ai-message assistant error"><div class="ai-message-bubble">Sorry, I'm having trouble connecting. Please try again in a moment.</div></div>`;
+        }
+
+        input.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        input.focus();
+        setTimeout(() => { messagesEl.scrollTop = messagesEl.scrollHeight; }, 0);
+    }
+
+    async submitReport() {
+        const descEl = document.getElementById('report-description');
+        const nameEl = document.getElementById('report-name');
+        const emailEl = document.getElementById('report-email');
+        const statusEl = document.getElementById('report-status');
+
+        if (!descEl || !descEl.value.trim()) {
+            if (statusEl) { statusEl.textContent = 'Please describe the issue.'; statusEl.className = 'report-status error'; }
+            return;
+        }
+
+        const submitBtn = document.querySelector('[data-action="submit-report"]');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
+        if (statusEl) { statusEl.textContent = ''; statusEl.className = 'report-status'; }
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/api/support/report`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    description: descEl.value.trim(),
+                    user_name: nameEl?.value.trim() || 'Anonymous',
+                    user_email: emailEl?.value.trim() || '',
+                    category: 'user_report'
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to submit');
+
+            const data = await response.json();
+
+            if (statusEl) {
+                const summaryText = data.ai_summary ? `\n\nAI Summary: ${data.ai_summary}` : '';
+                statusEl.textContent = `Report sent! The developer has been notified.${summaryText}`;
+                statusEl.className = 'report-status success';
+            }
+
+            // Clear form
+            descEl.value = '';
+            if (nameEl) nameEl.value = '';
+            if (emailEl) emailEl.value = '';
+
+        } catch (err) {
+            if (statusEl) {
+                statusEl.textContent = 'Failed to send report. Please try again or use the feedback form.';
+                statusEl.className = 'report-status error';
+            }
+        }
+
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send Report'; }
+    }
+
 }
 
 // Initialize the app when DOM is loaded

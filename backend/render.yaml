@@ -19,3 +19,9 @@ services:
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: FEEDBACK_WORKER_URL
+        value: https://siddhanath-feedback.cff-704.workers.dev
+      - key: NOTIFICATION_EMAIL
+        value: instanthpi@gmail.com
