@@ -44,6 +44,20 @@ app.get('/health', (req, res) => {
   });
 });
 
+// ─── YouTube embed proxy (for Chrome extension popup) ───────
+app.get('/embed/youtube', (req, res) => {
+  const videoId = req.query.v;
+  const startTime = parseInt(req.query.t) || 0;
+  const endTime = parseInt(req.query.end) || 0;
+  if (!videoId || !/^[\w-]+$/.test(videoId)) {
+    return res.status(400).send('Invalid video ID');
+  }
+  let src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&start=${startTime}&rel=0&modestbranding=1`;
+  if (endTime) src += `&end=${endTime}`;
+  res.setHeader('Content-Type', 'text/html');
+  res.send(`<!DOCTYPE html><html><head><style>*{margin:0;padding:0}body{background:#000;overflow:hidden}iframe{width:100%;height:100vh;border:none}</style></head><body><iframe src="${src}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></body></html>`);
+});
+
 // ─── Mount API routes ───────────────────────────────────────
 mountApiRoutes(app, supabase);
 
