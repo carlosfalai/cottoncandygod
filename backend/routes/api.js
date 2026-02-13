@@ -514,6 +514,95 @@ function mountApiRoutes(app, supabase) {
     }
   });
 
+  // ─── POST /api/sangha/post ──────────────────────────────
+  // Create a new community post.
+  app.post('/api/sangha/post', async (req, res) => {
+    try {
+      const { member_id, content, type, photo_url } = req.body;
+
+      if (!member_id || !content) {
+        return res.status(400).json({ error: 'member_id and content required' });
+      }
+
+      if (typeof content !== 'string' || content.length > 2000) {
+        return res.status(400).json({ error: 'Content too long (max 2000 characters)' });
+      }
+
+      const allowedTypes = ['general', 'meditation', 'food_prayer', 'satsang', 'report', 'donation'];
+      const postType = allowedTypes.includes(type) ? type : 'general';
+
+      // Validate photo_url if provided
+      let safePhotoUrl = null;
+      if (photo_url && typeof photo_url === 'string' && /^https?:\/\//i.test(photo_url)) {
+        safePhotoUrl = photo_url.slice(0, 500);
+      }
+
+      const { data: post, error } = await supabase
+        .from('ashram_posts')
+        .insert({
+          member_id,
+          content: content.trim().slice(0, 2000),
+          type: postType,
+          photo_url: safePhotoUrl,
+          created_at: new Date().toISOString()
+        })
+        .select(`
+          id, type, content, photo_url, created_at,
+          ashram_members!inner(id, name, mode)
+        `)
+        .single();
+
+      if (error) {
+        console.error('[API] Post error:', error.message);
+        return res.status(500).json({ error: 'Failed to create post' });
+      }
+
+      res.status(201).json({ post });
+
+    } catch (err) {
+      console.error('[API] Post error:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // ─── POST /api/sangha/seva ──────────────────────────────
+  // Log a seva activity.
+  app.post('/api/sangha/seva', async (req, res) => {
+    try {
+      const { member_id, type } = req.body;
+
+      if (!member_id || !type) {
+        return res.status(400).json({ error: 'member_id and type required' });
+      }
+
+      const allowedTypes = ['dining', 'cleaning', 'garden', 'temple', 'teaching', 'maintenance'];
+      if (!allowedTypes.includes(type)) {
+        return res.status(400).json({ error: 'Invalid seva type' });
+      }
+
+      const { data: seva, error } = await supabase
+        .from('ashram_seva')
+        .insert({
+          member_id,
+          seva_type: type,
+          checked_in_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('[API] Seva log error:', error.message);
+        return res.status(500).json({ error: 'Failed to log seva' });
+      }
+
+      res.status(201).json({ seva });
+
+    } catch (err) {
+      console.error('[API] Seva log error:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // ─── POST /api/sangha/register ────────────────────────────
   // Register a member from the web app (no Telegram required).
   app.post('/api/sangha/register', async (req, res) => {
