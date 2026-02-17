@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Siddhanath Kriya Yoga",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Your personal Kriya Yoga practice companion with events, teachings, and guided sessions from Yogiraj Siddhanath",
   "icons": {
     "16": "icons/icon16.png",
@@ -23,8 +23,7 @@
   "host_permissions": [
     "https://siddhanath-feedback.cff-704.workers.dev/*",
     "https://gbxksgxezbljwlnlpkpz.supabase.co/*",
-    "https://siddhanath-ashram-sangha.onrender.com/*",
-    "https://cdn.jsdelivr.net/*"
+    "https://siddhanath-ashram-sangha.onrender.com/*"
   ],
   "web_accessible_resources": [
     {

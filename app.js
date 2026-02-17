@@ -1693,10 +1693,10 @@ class YogaMarathonApp {
 
     async initSupabaseRealtime() {
         try {
-            // Load Supabase JS client from CDN
+            // Load Supabase JS client (bundled locally for MV3 compliance)
             if (!window.supabase) {
                 const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+                script.src = 'supabase.min.js';
                 document.head.appendChild(script);
                 await new Promise((resolve, reject) => {
                     script.onload = resolve;
