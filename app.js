@@ -713,13 +713,19 @@ class YogaMarathonApp {
             ${this.renderBillboard()}
             <div class="yoga-marathon-app">
                 ${this.renderHeader()}
-                ${this.renderAshramTime()}
-                ${this.renderSanghaAlerts()}
-                ${this.renderUpcomingEvents()}
-                ${this.renderMyPractice()}
-                ${this.renderSangha()}
-                ${this.renderSacredSayings()}
-                ${this.renderFeedbackButton()}
+                <div class="app-grid">
+                    <div class="app-main">
+                        ${this.renderAshramTime()}
+                        ${this.renderSanghaAlerts()}
+                        ${this.renderUpcomingEvents()}
+                        ${this.renderMyPractice()}
+                        ${this.renderSangha()}
+                        ${this.renderFeedbackButton()}
+                    </div>
+                    <div class="app-sidebar">
+                        ${this.renderSacredSayings()}
+                    </div>
+                </div>
                 ${this.renderFooter()}
             </div>
             ${this.renderFeedbackModal()}
