@@ -2378,3 +2378,35 @@ button:disabled,
     pointer-events: none;
 }
 
+/* ═══════════════════════════════════════════════
+   WEBSITE DESKTOP LAYOUT — expands from extension
+   ═══════════════════════════════════════════════ */
+
+@media (min-width: 900px) {
+  .yoga-marathon-app {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    align-items: start;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .app-header,
+  .billboard-container,
+  .ashram-clock,
+  .sangha-alerts-container,
+  #sk-extensions,
+  .my-practice,
+  .app-footer {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1200px) {
+  .yoga-marathon-app {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
