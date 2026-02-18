@@ -1,4 +1,3 @@
-// Enhanced Yoga Marathon Application with Interactive Features and Duplicate Prevention
 class YogaMarathonApp {
     constructor() {
         this.data = null;
@@ -197,9 +196,10 @@ class YogaMarathonApp {
         console.log('Setting up event listeners...');
         // Navigation
         document.addEventListener('click', (e) => {
-            if (e.target.matches('[data-action]')) {
-                console.log('Action clicked:', e.target.dataset.action);
-                this.handleAction(e.target.dataset.action, e.target);
+            const actionEl = e.target.closest('[data-action]');
+            if (actionEl) {
+                console.log('Action clicked:', actionEl.dataset.action);
+                this.handleAction(actionEl.dataset.action, actionEl);
             }
         });
 
@@ -214,6 +214,10 @@ class YogaMarathonApp {
         document.addEventListener('change', (e) => {
             if (e.target.id === 'category-filter') {
                 this.filterSayings(e.target.value);
+            }
+            const actionEl = e.target.closest('[data-action]');
+            if (actionEl && actionEl.dataset.action === 'change-sound') {
+                localStorage.setItem('kriya-sound', actionEl.value);
             }
         });
 
@@ -289,6 +293,13 @@ class YogaMarathonApp {
                 break;
             case 'reset-sequence':
                 this.resetSequence();
+                break;
+            case 'change-sound':
+                localStorage.setItem('kriya-sound', element.value);
+                break;
+            case 'preview-sound':
+                this.initAudio();
+                this.playSound('transition');
                 break;
             case 'open-feedback':
                 this.openFeedbackModal();
@@ -824,6 +835,16 @@ class YogaMarathonApp {
                 <div class="technique-list" id="technique-list">
                     ${this.customSequence.map((tech, idx) => this.renderTechniqueItem(tech, idx)).join('')}
                 </div>
+                <div class="sound-picker" style="display:flex;align-items:center;gap:8px;margin:12px 0;padding:10px 12px;background:white;border:1px solid #e0e0d0;border-radius:8px;">
+                    <label style="font-size:0.9rem;font-weight:500;">🔔 Sound:</label>
+                    <select data-action="change-sound" style="flex:1;padding:6px 8px;border:1px solid #ccc;border-radius:4px;font-size:0.9rem;">
+                        <option value="woodblock" ${this.getSelectedSound() === 'woodblock' ? 'selected' : ''}>Woodblock</option>
+                        <option value="bell" ${this.getSelectedSound() === 'bell' ? 'selected' : ''}>Tibetan Bell</option>
+                        <option value="bowl" ${this.getSelectedSound() === 'bowl' ? 'selected' : ''}>Singing Bowl</option>
+                        <option value="chime" ${this.getSelectedSound() === 'chime' ? 'selected' : ''}>Wind Chime</option>
+                    </select>
+                    <button class="practice-btn" data-action="preview-sound" style="padding:6px 12px;">▶ Test</button>
+                </div>
                 <div class="practice-actions">
                     <button class="practice-btn" data-action="add-technique">+ Add Technique</button>
                     <button class="practice-btn primary" data-action="start-practice">▶ Start Practice</button>
@@ -849,7 +870,7 @@ class YogaMarathonApp {
                 <div class="technique-toggle" data-action="toggle-technique" data-index="${index}">
                     ${tech.enabled ? '✓' : '○'}
                 </div>
-                <div class="technique-name">${tech.name}</div>
+                <div class="technique-name">${this.escapeHtml(tech.name)}</div>
                 <div class="technique-duration"
                      contenteditable="true"
                      data-action="edit-duration"
@@ -1259,7 +1280,7 @@ class YogaMarathonApp {
 
         return `
             <div class="session-preview ${isCompleted ? 'completed' : ''}">
-                <div class="session-title">${session.title}</div>
+                <div class="session-title">${this.escapeHtml(session.title || '')}</div>
                 <div class="session-meta">
                     <span class="difficulty ${difficulty}">${difficulty}</span>
                     <span class="duration">${duration}min</span>
@@ -1553,37 +1574,76 @@ class YogaMarathonApp {
     }
 
     showSessionModal(session) {
-        console.log('Showing session modal for:', session.title);
+        const safeVideoId = /^[\w-]+$/.test(session.videoId || '') ? session.videoId : '';
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal-content session-modal">
-                <div class="modal-header">
-                    <h3>${session.title}</h3>
-                    <button class="close-btn" data-action="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="session-video">
-                        <iframe src="https://www.youtube.com/embed/${session.videoId}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1"
-                                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
-                    <div class="session-details">
-                        <p><strong>Duration:</strong> ${session.analysis?.estimatedMinutes || 10} minutes</p>
-                        <p><strong>Difficulty:</strong> ${session.analysis?.difficulty || 'beginner'}</p>
-                        <div class="session-transcript">
-                            <h4>Session Guidance:</h4>
-                            <p>${this.extractSessionDescription(session)}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button data-action="complete-session" data-session-id="${session.videoId}" 
-                            class="primary-btn">Mark as Complete</button>
-                    <button class="secondary-btn" data-action="close-modal">Close</button>
-                </div>
-            </div>
-        `;
+
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content session-modal';
+
+        const header = document.createElement('div');
+        header.className = 'modal-header';
+        const h3 = document.createElement('h3');
+        h3.textContent = session.title || '';
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'close-btn';
+        closeBtn.dataset.action = 'close-modal';
+        closeBtn.textContent = '×';
+        header.appendChild(h3);
+        header.appendChild(closeBtn);
+
+        const body = document.createElement('div');
+        body.className = 'modal-body';
+        const videoDiv = document.createElement('div');
+        videoDiv.className = 'session-video';
+        if (safeVideoId) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube.com/embed/${safeVideoId}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1`;
+            iframe.frameBorder = '0';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            iframe.allowFullscreen = true;
+            iframe.referrerPolicy = 'no-referrer-when-downgrade';
+            videoDiv.appendChild(iframe);
+        }
+        const detailsDiv = document.createElement('div');
+        detailsDiv.className = 'session-details';
+        const dur = document.createElement('p');
+        dur.innerHTML = `<strong>Duration:</strong> ${parseInt(session.analysis?.estimatedMinutes) || 10} minutes`;
+        const diff = document.createElement('p');
+        const safeDiff = ['beginner', 'intermediate', 'advanced'].includes(session.analysis?.difficulty) ? session.analysis.difficulty : 'beginner';
+        diff.innerHTML = `<strong>Difficulty:</strong> ${safeDiff}`;
+        const transcriptDiv = document.createElement('div');
+        transcriptDiv.className = 'session-transcript';
+        const th4 = document.createElement('h4');
+        th4.textContent = 'Session Guidance:';
+        const tp = document.createElement('p');
+        tp.textContent = this.extractSessionDescription(session);
+        transcriptDiv.appendChild(th4);
+        transcriptDiv.appendChild(tp);
+        detailsDiv.appendChild(dur);
+        detailsDiv.appendChild(diff);
+        detailsDiv.appendChild(transcriptDiv);
+        body.appendChild(videoDiv);
+        body.appendChild(detailsDiv);
+
+        const footer = document.createElement('div');
+        footer.className = 'modal-footer';
+        const completeBtn = document.createElement('button');
+        completeBtn.dataset.action = 'complete-session';
+        completeBtn.dataset.sessionId = session.videoId || '';
+        completeBtn.className = 'primary-btn';
+        completeBtn.textContent = 'Mark as Complete';
+        const closeBtnFooter = document.createElement('button');
+        closeBtnFooter.className = 'secondary-btn';
+        closeBtnFooter.dataset.action = 'close-modal';
+        closeBtnFooter.textContent = 'Close';
+        footer.appendChild(completeBtn);
+        footer.appendChild(closeBtnFooter);
+
+        modalContent.appendChild(header);
+        modalContent.appendChild(body);
+        modalContent.appendChild(footer);
+        modal.appendChild(modalContent);
         
         document.body.appendChild(modal);
         
@@ -1626,16 +1686,24 @@ class YogaMarathonApp {
     showBeltPromotion(beltName) {
         const promotion = document.createElement('div');
         promotion.className = 'promotion-overlay';
-        promotion.innerHTML = `
-            <div class="promotion-content">
-                <div class="promotion-icon">🥋</div>
-                <h3>Hafiz Advancement!</h3>
-                <p>Congratulations! You've reached ${beltName}!</p>
-                <button class="primary-btn" onclick="this.parentElement.parentElement.remove()">
-                    Continue Journey
-                </button>
-            </div>
-        `;
+        const content = document.createElement('div');
+        content.className = 'promotion-content';
+        const icon = document.createElement('div');
+        icon.className = 'promotion-icon';
+        icon.textContent = '🥋';
+        const title = document.createElement('h3');
+        title.textContent = 'Hafiz Advancement!';
+        const msg = document.createElement('p');
+        msg.textContent = `Congratulations! You've reached ${beltName}!`;
+        const btn = document.createElement('button');
+        btn.className = 'primary-btn';
+        btn.textContent = 'Continue Journey';
+        btn.addEventListener('click', () => promotion.remove());
+        content.appendChild(icon);
+        content.appendChild(title);
+        content.appendChild(msg);
+        content.appendChild(btn);
+        promotion.appendChild(content);
         promotion.style.cssText = `
             position: fixed;
             top: 0;
@@ -1809,7 +1877,7 @@ class YogaMarathonApp {
                         <button class="action-btn" data-action="sangha-register">Join the Sangha</button>
                     ` : `
                         <span class="sangha-user-badge">
-                            ${this.sanghaUser.mode === 'physical' ? '🏕️' : '🌐'} ${this.sanghaUser.name}
+                            ${this.sanghaUser.mode === 'physical' ? '🏕️' : '🌐'} ${this.escapeHtml(this.sanghaUser.name || '')}
                         </span>
                     `}
                 </div>
@@ -1838,7 +1906,7 @@ class YogaMarathonApp {
                     <span class="post-author">${modeIcon} ${this.escapeHtml(member.name || 'Sangha Member')}</span>
                     <span class="post-time">${timeAgo}</span>
                 </div>
-                <div class="post-type-badge">${typeEmoji} ${post.type.replace('_', ' ')}</div>
+                <div class="post-type-badge">${typeEmoji} ${this.escapeHtml(String(post.type || '').replace('_', ' '))}</div>
                 ${post.content ? `<div class="post-content">${this.escapeHtml(post.content)}</div>` : ''}
                 ${post.photo_url && /^https?:\/\//.test(post.photo_url) ? `<img src="${this.escapeHtml(post.photo_url)}" class="post-photo" alt="Sangha photo" loading="lazy">` : ''}
                 ${post.video_url && /^https?:\/\//.test(post.video_url) ? `
@@ -1981,19 +2049,64 @@ class YogaMarathonApp {
         }
     }
 
+    getSelectedSound() {
+        return localStorage.getItem('kriya-sound') || 'woodblock';
+    }
+
     playWoodblock(pitch = 'high') {
+        this.playSound(pitch === 'high' ? 'tick' : 'transition');
+    }
+
+    playSound(type = 'transition') {
         try {
             this.initAudio();
-            const osc = this.audioCtx.createOscillator();
-            const gain = this.audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(this.audioCtx.destination);
-            osc.type = 'sine';
-            osc.frequency.value = pitch === 'high' ? 800 : 400;
-            gain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.15);
-            osc.start(this.audioCtx.currentTime);
-            osc.stop(this.audioCtx.currentTime + 0.15);
+            const sound = this.getSelectedSound();
+            const t = this.audioCtx.currentTime;
+
+            if (sound === 'woodblock') {
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+                osc.connect(gain); gain.connect(this.audioCtx.destination);
+                osc.frequency.value = type === 'tick' ? 800 : 400;
+                osc.type = 'triangle';
+                gain.gain.setValueAtTime(0.4, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + (type === 'tick' ? 0.15 : 0.5));
+                osc.start(t); osc.stop(t + 0.5);
+            } else if (sound === 'bell') {
+                [523, 659, 784].forEach((freq, i) => {
+                    const osc = this.audioCtx.createOscillator();
+                    const gain = this.audioCtx.createGain();
+                    osc.connect(gain); gain.connect(this.audioCtx.destination);
+                    osc.frequency.value = type === 'tick' ? freq * 1.5 : freq;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.15, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + (type === 'tick' ? 0.8 : 2.5));
+                    osc.start(t + i * 0.02); osc.stop(t + 3);
+                });
+            } else if (sound === 'bowl') {
+                const osc1 = this.audioCtx.createOscillator();
+                const osc2 = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+                osc1.connect(gain); osc2.connect(gain); gain.connect(this.audioCtx.destination);
+                osc1.frequency.value = type === 'tick' ? 320 : 220;
+                osc2.frequency.value = (type === 'tick' ? 320 : 220) * 1.502;
+                osc1.type = 'sine'; osc2.type = 'sine';
+                gain.gain.setValueAtTime(0.25, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + (type === 'tick' ? 1 : 3));
+                osc1.start(t); osc2.start(t);
+                osc1.stop(t + 3.5); osc2.stop(t + 3.5);
+            } else if (sound === 'chime') {
+                [1047, 1319, 1568, 2093].forEach((freq, i) => {
+                    const osc = this.audioCtx.createOscillator();
+                    const gain = this.audioCtx.createGain();
+                    osc.connect(gain); gain.connect(this.audioCtx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.12, t + i * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + (type === 'tick' ? 0.5 : 1.5));
+                    osc.start(t + i * 0.08); osc.stop(t + 2);
+                });
+            }
         } catch (e) { console.error('Audio error:', e); }
     }
 
