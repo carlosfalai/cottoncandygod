@@ -1,0 +1,266 @@
+:root {
+  --background-color: #ffffee;
+  --primary-green: #117743;
+  --dark-nav-color: #1a2744;
+  --card-background: #fff9e6;
+  --border-color: #e0d8c8;
+  --text-color: #1a1a2e;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  font-family: 'Georgia', serif;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.seva-app {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background-color: var(--dark-nav-color);
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.title-section {
+  font-family: 'Georgia', serif;
+}
+
+.billboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--dark-nav-color);
+  color: white;
+  padding: 10px;
+}
+
+.billboard-ticker {
+  animation: ticker 20s linear infinite;
+}
+
+.billboard-message {
+  margin-left: 20px;
+}
+
+.ashram-time-bar {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--card-background);
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.time-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-label {
+  font-size: 0.9rem;
+}
+
+.time-value {
+  font-size: 1.1rem;
+  color: var(--primary-green);
+}
+
+.time-divider {
+  width: 1px;
+  height: 40px;
+  background-color: var(--border-color);
+}
+
+.seva-nav {
+  display: flex;
+  background-color: var(--card-background);
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.seva-tabs {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.seva-tab {
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  background-color: var(--border-color);
+  transition: background-color 0.3s;
+}
+
+.seva-tab.active {
+  background-color: var(--primary-green);
+  color: white;
+}
+
+.seva-module-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.seva-card {
+  background-color: var(--card-background);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s;
+  max-width: 48%;
+  flex: 1;
+}
+
+.seva-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.seva-section-header {
+  font-family: 'Georgia', serif;
+  margin-bottom: 10px;
+}
+
+.seva-btn {
+  background-color: var(--primary-green);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.seva-btn:hover {
+  background-color: #0a5a31;
+}
+
+.seva-btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--primary-green);
+  color: var(--primary-green);
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.seva-btn-outline:hover {
+  border-color: #0a5a31;
+  color: #0a5a31;
+}
+
+.seva-badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
+
+.seva-badge-high {
+  background-color: #ff8585;
+  color: white;
+}
+
+.seva-badge-medium {
+  background-color: #ffd700;
+  color: white;
+}
+
+.seva-badge-pending {
+  background-color: #ffa500;
+  color: white;
+}
+
+.seva-empty-state {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 50px;
+}
+
+.app-footer {
+  padding: 20px;
+  background-color: var(--dark-nav-color);
+  color: white;
+  text-align: center;
+}
+
+.footer-links {
+  margin-top: 10px;
+}
+
+.auth-btn {
+  background-color: var(--primary-green);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.auth-user-info {
+  display: flex;
+  align-items: center;
+}
+
+.auth-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.auth-name {
+  font-size: 1rem;
+}
+
+.auth-signout {
+  margin-left: 20px;
+  color: var(--primary-green);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
