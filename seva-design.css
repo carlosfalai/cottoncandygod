@@ -1,45 +1,45 @@
 :root {
   --background-color: #ffffee;
-  --primary-green: #117743;
-  --dark-nav-color: #1a2744;
-  --card-background: #fff9e6;
+  --primary-color: #117743;
+  --primary-hover: #0d5a33;
+  --dark-bar: #1a2744;
+  --card-color: #fff9e6;
   --border-color: #e0d8c8;
   --text-color: #1a1a2e;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-h1 {
-  font-family: 'Georgia', serif;
-  font-size: 2.5rem;
-  margin-bottom: 20px;
+  --spacing-unit: 4px;
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --font-inter: "Inter", sans-serif;
+  --font-georgia: Georgia, serif;
 }
 
 .seva-app {
-  display: flex;
-  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: var(--font-inter);
+  padding: calc(var(--spacing-unit) * 8);
 }
 
 .app-header {
-  background-color: var(--dark-nav-color);
-  color: white;
-  padding: 10px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: var(--dark-bar);
+  padding: calc(var(--spacing-unit) * 4);
+  border-radius: var(--radius-lg);
 }
 
 .header-content {
   display: flex;
-  flex-direction: column;
-  text-align: center;
+  align-items: center;
 }
 
 .logo-section {
@@ -48,188 +48,199 @@ h1 {
 }
 
 .logo {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
+  margin-right: calc(var(--spacing-unit) * 4);
 }
 
 .title-section {
-  font-family: 'Georgia', serif;
+  color: white;
+  font-family: var(--font-georgia);
 }
 
 .billboard-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--dark-nav-color);
+  background-color: var(--dark-bar);
+  padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4);
   color: white;
-  padding: 10px;
+  border-radius: var(--radius-md);
 }
 
 .billboard-ticker {
-  animation: ticker 20s linear infinite;
+  display: flex;
+  align-items: center;
 }
 
 .billboard-message {
-  margin-left: 20px;
+  animation: billboard-animate 10s linear infinite;
+}
+
+@keyframes billboard-animate {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 
 .ashram-time-bar {
   display: flex;
-  justify-content: space-between;
-  background-color: var(--card-background);
-  padding: 10px;
-  border-bottom: 1px solid var(--border-color);
+  justify-content: center;
+  margin: calc(var(--spacing-unit) * 4) 0;
+  padding: calc(var(--spacing-unit) * 2);
 }
 
 .time-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  padding: 0 calc(var(--spacing-unit) * 2);
 }
 
 .time-label {
-  font-size: 0.9rem;
+  margin-right: var(--spacing-unit);
 }
 
 .time-value {
-  font-size: 1.1rem;
-  color: var(--primary-green);
+  font-weight: bold;
 }
 
 .time-divider {
-  width: 1px;
-  height: 40px;
-  background-color: var(--border-color);
+  margin: 0 calc(var(--spacing-unit) * 2);
 }
 
 .seva-nav {
   display: flex;
-  background-color: var(--card-background);
-  padding: 10px;
-  margin-bottom: 20px;
+  justify-content: center;
+  margin: calc(var(--spacing-unit) * 6) 0;
 }
 
 .seva-tabs {
   display: flex;
-  justify-content: space-around;
-  width: 100%;
+  gap: calc(var(--spacing-unit) * 2);
 }
 
 .seva-tab {
-  padding: 10px 20px;
-  border-radius: 30px;
+  padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4);
+  background-color: var(--card-color);
+  border-radius: var(--radius-full);
   cursor: pointer;
-  background-color: var(--border-color);
   transition: background-color 0.3s;
 }
 
-.seva-tab.active {
-  background-color: var(--primary-green);
+.seva-tab.active,
+.seva-tab:hover {
+  background-color: var(--primary-color);
   color: white;
 }
 
 .seva-module-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.seva-card {
-  background-color: var(--card-background);
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s;
-  max-width: 48%;
-  flex: 1;
-}
-
-.seva-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  gap: calc(var(--spacing-unit) * 8);
+  margin-top: calc(var(--spacing-unit) * 6);
 }
 
 .seva-section-header {
-  font-family: 'Georgia', serif;
-  margin-bottom: 10px;
+  font-family: var(--font-georgia);
+  font-size: 24px;
+  margin-bottom: calc(var(--spacing-unit) * 4);
+}
+
+.seva-card {
+  background-color: var(--card-color);
+  padding: calc(var(--spacing-unit) * 6);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s;
+}
+
+.seva-card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .seva-btn {
-  background-color: var(--primary-green);
+  display: inline-block;
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 6);
+  background-color: var(--primary-color);
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 30px;
-  cursor: pointer;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  text-decoration: none;
+  text-align: center;
   transition: background-color 0.3s;
 }
 
 .seva-btn:hover {
-  background-color: #0a5a31;
+  background-color: var(--primary-hover);
 }
 
 .seva-btn-outline {
   background-color: transparent;
-  border: 1px solid var(--primary-green);
-  color: var(--primary-green);
-  padding: 10px 20px;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: border-color 0.3s, color 0.3s;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  transition: background-color 0.3s;
 }
 
 .seva-btn-outline:hover {
-  border-color: #0a5a31;
-  color: #0a5a31;
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .seva-badge {
   display: inline-block;
-  border-radius: 999px;
-  padding: 5px 10px;
-  font-size: 0.8rem;
+  padding: calc(var(--spacing-unit) / 2) calc(var(--spacing-unit) * 2);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  border: 2px solid;
 }
 
 .seva-badge-high {
-  background-color: #ff8585;
-  color: white;
+  background-color: #ffeded;
+  border-color: #ff4d4d;
+  color: #ff4d4d;
 }
 
 .seva-badge-medium {
-  background-color: #ffd700;
-  color: white;
+  background-color: #fff6e5;
+  border-color: #ffaa56;
+  color: #ffaa56;
 }
 
 .seva-badge-pending {
-  background-color: #ffa500;
-  color: white;
+  background-color: #eef7ff;
+  border-color: #56aaff;
+  color: #56aaff;
 }
 
 .seva-empty-state {
+  margin-top: calc(var(--spacing-unit) * 6);
   text-align: center;
-  font-size: 1.2rem;
-  margin-top: 50px;
+  color: var(--text-color);
 }
 
 .app-footer {
-  padding: 20px;
-  background-color: var(--dark-nav-color);
-  color: white;
-  text-align: center;
+  margin-top: calc(var(--spacing-unit) * 8);
+  padding: calc(var(--spacing-unit) * 6) 0;
+  background-color: var(--dark-bar);
+  border-radius: var(--radius-lg);
 }
 
 .footer-links {
-  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--spacing-unit) * 4);
+}
+
+.footer-links a {
+  color: white;
+  text-decoration: none;
 }
 
 .auth-btn {
-  background-color: var(--primary-green);
+  background-color: var(--primary-color);
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 30px;
-  cursor: pointer;
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 6);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  transition: background-color 0.3s;
+}
+
+.auth-btn:hover {
+  background-color: var(--primary-hover);
 }
 
 .auth-user-info {
@@ -241,26 +252,44 @@ h1 {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-right: calc(var(--spacing-unit) * 2);
 }
 
 .auth-name {
-  font-size: 1rem;
+  color: white;
 }
 
 .auth-signout {
-  margin-left: 20px;
-  color: var(--primary-green);
+  margin-left: calc(var(--spacing-unit) * 4);
+  color: white;
   cursor: pointer;
-  text-decoration: underline;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
+  gap: calc(var(--spacing-unit) * 4);
 }
 
-@keyframes ticker {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+@media (max-width: 768px) {
+  .seva-app {
+    padding: var(--spacing-unit) * 4;
+  }
+
+  .app-header,
+  .ashram-time-bar,
+  .seva-nav,
+  .app-footer {
+    flex-direction: column;
+  }
+
+  .auth-user-info {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    align-items: center;
+  }
 }
