@@ -707,9 +707,6 @@ class YogaMarathonApp {
                 ${this.renderUpcomingEvents()}
                 ${this.renderMyPractice()}
                 ${this.renderSangha()}
-                ${this.renderProgressDashboard()}
-                ${this.renderBeltProgression()}
-                ${this.renderCurrentSession()}
                 ${this.renderSacredSayings()}
                 ${this.renderFeedbackButton()}
                 ${this.renderFooter()}
