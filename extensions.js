@@ -1,12 +1,12 @@
-/**
- * Siddhanath Kriya Yoga — Extensions
+﻿/**
+ * Siddhanath Kriya Yoga ΓÇö Extensions
  * Adds: Google Auth, Gurumata's Will, Amazon Store, Learning Modules, Nature Guide, Shivraj
  * Injected AFTER app.js initializes.
  */
 
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // GOOGLE AUTH (Supabase OAuth)
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 let currentUser = null;
 
 function getSupabase() {
@@ -154,9 +154,9 @@ function injectExtensions() {
   setupExtensionListeners();
 }
 
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // RENDER ALL EXTENSIONS
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function renderAllExtensions() {
   return `
     ${renderExtNav()}
@@ -169,20 +169,20 @@ function renderAllExtensions() {
   `;
 }
 
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // EXTENSION NAVIGATION BAR
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function renderExtNav() {
   const tabs = [
-    { id: 'gurumata', emoji: '💛', label: "Gurumata's Will" },
-    { id: 'store',    emoji: '🛒', label: 'Community Store' },
-    { id: 'learn',    emoji: '📚', label: 'AI Learning' },
-    { id: 'nature',   emoji: '🌿', label: 'Ashram Nature' },
-    { id: 'shivraj',  emoji: '🔒', label: 'Shivraj' },
+    { id: 'gurumata', emoji: '≡ƒÆ¢', label: "Gurumata's Will" },
+    { id: 'store',    emoji: '≡ƒ¢Æ', label: 'Community Store' },
+    { id: 'learn',    emoji: '≡ƒôÜ', label: 'AI Learning' },
+    { id: 'nature',   emoji: '≡ƒî┐', label: 'Ashram Nature' },
+    { id: 'shivraj',  emoji: '≡ƒöÆ', label: 'Shivraj' },
   ];
   return `
     <div class="ext-nav" id="ext-nav">
-      <h3 class="ext-nav-title">🕉️ Community Features</h3>
+      <h3 class="ext-nav-title">≡ƒòë∩╕Å Community Features</h3>
       <div class="ext-nav-tabs">
         ${tabs.map((t, i) => `
           <button class="ext-tab-btn ${i === 0 ? 'active' : ''}" data-ext-tab="${t.id}">
@@ -194,13 +194,13 @@ function renderExtNav() {
   `;
 }
 
-// ══════════════════════════════════════════════════════
-// GURUMATA'S WILL 💛
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// GURUMATA'S WILL ≡ƒÆ¢
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 const GURUMATA_TASKS = [
   {
     id: 'gm1',
-    title: '🪬 Blessed Bangles for the Ladies',
+    title: '≡ƒ¬¼ Blessed Bangles for the Ladies',
     category: 'Sacred Gift',
     priority: 'high',
     description: `Gurumata's wish: Bangles are to be collected, blessed by Gurunath during his next available darshan, and then personally given to each of the ladies in the sangha. This is a sacred act of grace and love. The bangles should be simple, beautiful, and appropriate for daily wear. Ensure every lady receives one.`,
@@ -210,7 +210,7 @@ const GURUMATA_TASKS = [
   },
   {
     id: 'gm2',
-    title: '🌸 Comfort & Happiness of the Ladies',
+    title: '≡ƒî╕ Comfort & Happiness of the Ladies',
     category: 'Wellbeing',
     priority: 'high',
     description: `Gurunath does not want the ladies to be slacking or uncomfortable. Gurumata's spirit asks us to ensure all ladies in the ashram and in the community feel cared for, supported, and at ease during retreats and seva periods. Check in with them regularly. Assign comfortable seva tasks. Ensure they have everything they need.`,
@@ -220,7 +220,7 @@ const GURUMATA_TASKS = [
   },
   {
     id: 'gm3',
-    title: '🕯️ Daily Prayer Lamp (Diya) at Gurumata\'s Shrine',
+    title: '≡ƒò»∩╕Å Daily Prayer Lamp (Diya) at Gurumata\'s Shrine',
     category: 'Sacred Ritual',
     priority: 'high',
     description: `A diya (oil lamp) should be lit every morning and evening at Gurumata's memorial shrine in the ashram. This is a continuous seva that should be assigned to a dedicated volunteer during each retreat season. The lamp is never to go out during retreat season.`,
@@ -230,7 +230,7 @@ const GURUMATA_TASKS = [
   },
   {
     id: 'gm4',
-    title: '📿 Malas Distributed to New Initiates',
+    title: '≡ƒô┐ Malas Distributed to New Initiates',
     category: 'Sacred Gift',
     priority: 'medium',
     description: `Gurumata wished for all new initiates to receive a mala (prayer beads) at the time of their initiation. A stock of malas should be maintained at the ashram. A trusted Hamsa should be responsible for sourcing and blessing these before distribution.`,
@@ -240,7 +240,7 @@ const GURUMATA_TASKS = [
   },
   {
     id: 'gm5',
-    title: '🌺 Fresh Flowers at Temple Daily',
+    title: '≡ƒî║ Fresh Flowers at Temple Daily',
     category: 'Sacred Ritual',
     priority: 'medium',
     description: `Fresh flowers at the temple altar every day during retreat season. Gurumata loved flowers and believed their presence in the temple kept the energy bright. Assign to a willing volunteer who enjoys this gentle seva.`,
@@ -250,7 +250,7 @@ const GURUMATA_TASKS = [
   },
   {
     id: 'gm6',
-    title: '📖 Gurumata\'s Teachings Archive',
+    title: '≡ƒôû Gurumata\'s Teachings Archive',
     category: 'Documentation',
     priority: 'medium',
     description: `Collect all available recordings, notes, and written teachings from Gurumata Shivangini. Digitize and archive them so future generations of Hamsas can access her wisdom. A tech-savvy volunteer should lead this project.`,
@@ -276,7 +276,7 @@ function renderGurumataWill() {
       <p class="gm-task-desc">${escapeHtml(t.description)}</p>
       <div class="gm-task-actions">
         <input class="gm-claim-input" id="claim-input-${t.id}" placeholder="Your Hamsa name to claim this seva..." />
-        <button class="gm-claim-btn" data-gm-claim="${t.id}">🙏 Claim This Seva</button>
+        <button class="gm-claim-btn" data-gm-claim="${t.id}">≡ƒÖÅ Claim This Seva</button>
       </div>
     </div>
   `).join('');
@@ -284,9 +284,9 @@ function renderGurumataWill() {
   return `
     <div class="ext-content">
       <div class="ext-header">
-        <span class="ext-icon">💛</span>
+        <span class="ext-icon">≡ƒÆ¢</span>
         <div>
-          <h2 class="ext-title">Gurumata's Will — Sacred Tasks</h2>
+          <h2 class="ext-title">Gurumata's Will ΓÇö Sacred Tasks</h2>
           <p class="ext-subtitle">These are the wishes of Gurumata Shivangini. Honor her memory by completing them.</p>
         </div>
       </div>
@@ -298,7 +298,7 @@ function renderGurumataWill() {
       </div>
 
       <div class="gm-alert">
-        ⚠️ Gurunath's instruction: <strong>The ladies must be comfortable and happy. They must not feel neglected or burdened.</strong> This is Gurumata's dearest wish.
+        ΓÜá∩╕Å Gurunath's instruction: <strong>The ladies must be comfortable and happy. They must not feel neglected or burdened.</strong> This is Gurumata's dearest wish.
       </div>
 
       <div class="gm-tasks">
@@ -308,28 +308,28 @@ function renderGurumataWill() {
   `;
 }
 
-// ══════════════════════════════════════════════════════
-// AMAZON AFFILIATE STORE 🛒
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// AMAZON AFFILIATE STORE ≡ƒ¢Æ
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 const AFFILIATE_TAG = 'siddhanath-21';
 
 const STORE_ITEMS = [
-  { name: 'Neem Soap Pack', cat: 'Bath', emoji: '🧼', kw: 'neem soap herbal ayurvedic 6 pack' },
-  { name: 'Coconut Oil 500ml', cat: 'Bath', emoji: '🥥', kw: 'virgin coconut oil 500ml cold pressed' },
-  { name: 'Herbal Toothpaste', cat: 'Bath', emoji: '🦷', kw: 'herbal toothpaste neem clove ayurvedic' },
-  { name: 'Organic Ghee 500g', cat: 'Kitchen', emoji: '🍯', kw: 'a2 cow ghee organic 500g' },
-  { name: 'Water Bottle 1L', cat: 'Kitchen', emoji: '💧', kw: 'stainless steel insulated water bottle 1 litre' },
-  { name: 'Himalayan Salt 1kg', cat: 'Kitchen', emoji: '🧂', kw: 'himalayan pink salt 1kg natural' },
-  { name: 'Toilet Paper ×10', cat: 'Home', emoji: '🧻', kw: 'toilet paper soft 10 pack' },
-  { name: 'Jute Bags ×3', cat: 'Home', emoji: '🛍️', kw: 'jute shopping bags reusable 3 pack' },
-  { name: 'Beeswax Candles', cat: 'Home', emoji: '🕯️', kw: 'beeswax candles natural 12 pack' },
-  { name: 'Rudraksha Mala', cat: 'Spiritual', emoji: '📿', kw: '5 mukhi rudraksha mala 108 beads authentic' },
-  { name: 'Incense Sampler', cat: 'Spiritual', emoji: '🌿', kw: 'incense sticks sandalwood rose nag champa variety' },
-  { name: 'Puja Thali Set', cat: 'Spiritual', emoji: '🪔', kw: 'brass puja thali set diya plate ritual' },
-  { name: 'Copper Tongue Scraper', cat: 'Health', emoji: '✨', kw: 'copper tongue scraper ayurvedic' },
-  { name: 'Ashwagandha Caps', cat: 'Health', emoji: '💊', kw: 'ashwagandha ksm-66 organic capsules 500mg' },
-  { name: 'Neti Pot Ceramic', cat: 'Health', emoji: '🫙', kw: 'ceramic neti pot nasal irrigation jala neti' },
-  { name: 'Meditation Cushion', cat: 'Spiritual', emoji: '🧘', kw: 'meditation cushion zafu buckwheat cotton' },
+  { name: 'Neem Soap Pack', cat: 'Bath', emoji: '≡ƒº╝', kw: 'neem soap herbal ayurvedic 6 pack' },
+  { name: 'Coconut Oil 500ml', cat: 'Bath', emoji: '≡ƒÑÑ', kw: 'virgin coconut oil 500ml cold pressed' },
+  { name: 'Herbal Toothpaste', cat: 'Bath', emoji: '≡ƒª╖', kw: 'herbal toothpaste neem clove ayurvedic' },
+  { name: 'Organic Ghee 500g', cat: 'Kitchen', emoji: '≡ƒì»', kw: 'a2 cow ghee organic 500g' },
+  { name: 'Water Bottle 1L', cat: 'Kitchen', emoji: '≡ƒÆº', kw: 'stainless steel insulated water bottle 1 litre' },
+  { name: 'Himalayan Salt 1kg', cat: 'Kitchen', emoji: '≡ƒºé', kw: 'himalayan pink salt 1kg natural' },
+  { name: 'Toilet Paper ├ù10', cat: 'Home', emoji: '≡ƒº╗', kw: 'toilet paper soft 10 pack' },
+  { name: 'Jute Bags ├ù3', cat: 'Home', emoji: '≡ƒ¢ì∩╕Å', kw: 'jute shopping bags reusable 3 pack' },
+  { name: 'Beeswax Candles', cat: 'Home', emoji: '≡ƒò»∩╕Å', kw: 'beeswax candles natural 12 pack' },
+  { name: 'Rudraksha Mala', cat: 'Spiritual', emoji: '≡ƒô┐', kw: '5 mukhi rudraksha mala 108 beads authentic' },
+  { name: 'Incense Sampler', cat: 'Spiritual', emoji: '≡ƒî┐', kw: 'incense sticks sandalwood rose nag champa variety' },
+  { name: 'Puja Thali Set', cat: 'Spiritual', emoji: '≡ƒ¬ö', kw: 'brass puja thali set diya plate ritual' },
+  { name: 'Copper Tongue Scraper', cat: 'Health', emoji: 'Γ£¿', kw: 'copper tongue scraper ayurvedic' },
+  { name: 'Ashwagandha Caps', cat: 'Health', emoji: '≡ƒÆè', kw: 'ashwagandha ksm-66 organic capsules 500mg' },
+  { name: 'Neti Pot Ceramic', cat: 'Health', emoji: '≡ƒ½Ö', kw: 'ceramic neti pot nasal irrigation jala neti' },
+  { name: 'Meditation Cushion', cat: 'Spiritual', emoji: '≡ƒºÿ', kw: 'meditation cushion zafu buckwheat cotton' },
 ];
 
 function renderAffiliateStore() {
@@ -341,7 +341,7 @@ function renderAffiliateStore() {
         <div class="store-emoji">${p.emoji}</div>
         <div class="store-name">${escapeHtml(p.name)}</div>
         <div class="store-cat">${p.cat}</div>
-        <a class="store-btn" href="${url}" target="_blank" rel="noopener noreferrer">Buy on Amazon →</a>
+        <a class="store-btn" href="${url}" target="_blank" rel="noopener noreferrer">Buy on Amazon ΓåÆ</a>
       </div>
     `;
   }).join('');
@@ -349,45 +349,45 @@ function renderAffiliateStore() {
   return `
     <div class="ext-content">
       <div class="ext-header">
-        <span class="ext-icon">🛒</span>
+        <span class="ext-icon">≡ƒ¢Æ</span>
         <div>
-          <h2 class="ext-title">Community Store — Support the Ashram</h2>
-          <p class="ext-subtitle">Buy daily essentials through our Amazon affiliate links. Commission goes directly to the ashram — at no extra cost to you.</p>
+          <h2 class="ext-title">Community Store ΓÇö Support the Ashram</h2>
+          <p class="ext-subtitle">Buy daily essentials through our Amazon affiliate links. Commission goes directly to the ashram ΓÇö at no extra cost to you.</p>
         </div>
       </div>
       <div class="store-info">
-        💡 <strong>How it works:</strong> Click any product → buy normally on Amazon → 2-5% goes to the ashram. Hamsas buy together, ashram benefits automatically.
+        ≡ƒÆí <strong>How it works:</strong> Click any product ΓåÆ buy normally on Amazon ΓåÆ 2-5% goes to the ashram. Hamsas buy together, ashram benefits automatically.
       </div>
       <div class="store-filters" id="store-filters">
         ${categories.map((c, i) => `<button class="store-filter-btn ${i===0?'active':''}" data-store-cat="${c}">${c}</button>`).join('')}
       </div>
       <div class="store-grid" id="store-grid">${items}</div>
-      <div class="store-footer">Affiliate ID: ${AFFILIATE_TAG} · Amazon India Associates Program</div>
+      <div class="store-footer">Affiliate ID: ${AFFILIATE_TAG} ┬╖ Amazon India Associates Program</div>
     </div>
   `;
 }
 
-// ══════════════════════════════════════════════════════
-// AI LEARNING MODULES 📚
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// AI LEARNING MODULES ≡ƒôÜ
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 const MODULES = [
   {
     id: 'hindi',
-    emoji: '🇮🇳',
+    emoji: '≡ƒç«≡ƒç│',
     title: 'Conversational Hindi',
     subtitle: 'Learn real daily Hindi used in India',
     price: '$17/month',
     color: '#FF9933',
-    description: 'AI-powered Hindi tutor trained on everyday conversational phrases. Practice speaking, listening, and reading Hindi as it\'s actually spoken in India — not textbook Hindi.',
+    description: 'AI-powered Hindi tutor trained on everyday conversational phrases. Practice speaking, listening, and reading Hindi as it\'s actually spoken in India ΓÇö not textbook Hindi.',
     features: ['Daily conversation practice', 'Pronunciation guidance', 'Common phrases used in the ashram', 'Devanagari script basics', 'Progress tracking'],
     sample: [
-      { q: 'How do you say "I would like some chai"?', a: 'मुझे चाय चाहिए (Mujhe chai chahiye)' },
-      { q: 'What does "seva" mean?', a: 'सेवा (Seva) = selfless service, done with love and devotion' },
+      { q: 'How do you say "I would like some chai"?', a: 'αñ«αÑüαñ¥αÑç αñÜαñ╛αñ» αñÜαñ╛αñ╣αñ┐αñÅ (Mujhe chai chahiye)' },
+      { q: 'What does "seva" mean?', a: 'αñ╕αÑçαñ╡αñ╛ (Seva) = selfless service, done with love and devotion' },
     ],
   },
   {
     id: 'sanskrit',
-    emoji: '🕉️',
+    emoji: '≡ƒòë∩╕Å',
     title: 'Bhagavad Gita Sanskrit',
     subtitle: 'Learn Sanskrit through sacred scripture',
     price: '$17/month',
@@ -395,27 +395,27 @@ const MODULES = [
     description: 'Learn Sanskrit using the Bhagavad Gita as your textbook. Understand the shlokas in their original form, learn grammar through sacred context, and discover the deeper meanings of Gurunath\'s teachings.',
     features: ['Gita shloka breakdown', 'Sanskrit grammar through context', 'Word-by-word translation', 'Pronunciation with audio', 'Gurunath\'s commentary integration'],
     sample: [
-      { q: 'What is the first shloka of the Gita?', a: '"Dharma-kshetre Kuru-kshetre samavetaa yuyutsavah..." — Field of Dharma, field of Kuru — the battle of life begins.' },
-      { q: 'What does "Yoga" mean in Sanskrit?', a: 'यog (Yoga) = union, from root "yuj" — to join, to yoke. Union of individual self with cosmic consciousness.' },
+      { q: 'What is the first shloka of the Gita?', a: '"Dharma-kshetre Kuru-kshetre samavetaa yuyutsavah..." ΓÇö Field of Dharma, field of Kuru ΓÇö the battle of life begins.' },
+      { q: 'What does "Yoga" mean in Sanskrit?', a: 'αñ»og (Yoga) = union, from root "yuj" ΓÇö to join, to yoke. Union of individual self with cosmic consciousness.' },
     ],
   },
   {
     id: 'gurunath',
-    emoji: '🌅',
+    emoji: '≡ƒîà',
     title: 'Gurunath\'s Teachings',
     subtitle: 'AI companion for Yogiraj Siddhanath\'s wisdom',
     price: '$17/month',
     color: '#c41e3a',
-    description: 'An AI companion trained on Gurunath\'s teachings, books, and sacred sayings. Ask questions about Kriya Yoga, consciousness, spiritual evolution, and daily life guidance — answered in the spirit of Yogiraj Siddhanath.',
+    description: 'An AI companion trained on Gurunath\'s teachings, books, and sacred sayings. Ask questions about Kriya Yoga, consciousness, spiritual evolution, and daily life guidance ΓÇö answered in the spirit of Yogiraj Siddhanath.',
     features: ['4,941 sacred sayings searchable', '280 teaching sessions cross-referenced', 'Kriya Yoga technique guidance', 'Spiritual Q&A', 'Daily wisdom doses'],
     sample: [
       { q: 'What is Gurunath\'s teaching on inner peace?', a: '"Earth peace through self peace." Peace begins within. When you are at peace, you radiate peace to those around you.' },
-      { q: 'What is the purpose of Kriya Yoga?', a: 'Kriya Yoga is the science of selfing into the Self — returning individual consciousness to its cosmic source.' },
+      { q: 'What is the purpose of Kriya Yoga?', a: 'Kriya Yoga is the science of selfing into the Self ΓÇö returning individual consciousness to its cosmic source.' },
     ],
   },
   {
     id: 'nature',
-    emoji: '🌿',
+    emoji: '≡ƒî┐',
     title: 'Ashram Nature Guide',
     subtitle: 'Flora, fauna & wildlife of Gurunath\'s ashram region',
     price: '$10/month',
@@ -423,7 +423,7 @@ const MODULES = [
     description: 'Discover the incredible natural world of the ashram region in Maharashtra, India. Learn about the trees, flowers, fruits, birds, and animals you encounter during your visits.',
     features: ['50+ local tree species', 'Ashram fruit trees identified', 'Bird species with calls', 'Medicinal plants guide', 'Monsoon ecosystem guide'],
     sample: [
-      { q: 'What is the large tree near the temple?', a: 'Likely a Peepal (Ficus religiosa) — sacred in Hindu tradition, Buddhat attained enlightenment under one. Look for heart-shaped leaves with a long drip-tip.' },
+      { q: 'What is the large tree near the temple?', a: 'Likely a Peepal (Ficus religiosa) ΓÇö sacred in Hindu tradition, Buddhat attained enlightenment under one. Look for heart-shaped leaves with a long drip-tip.' },
       { q: 'What birds can I hear at dawn in the ashram?', a: 'Likely: Indian Paradise Flycatcher (long white tail), Asian Koel (loud melodic call), Common Myna, Spotted Owlet, and perhaps a Shikra hawk.' },
     ],
   },
@@ -434,7 +434,7 @@ function renderLearningModules() {
   return `
     <div class="ext-content">
       <div class="ext-header">
-        <span class="ext-icon">📚</span>
+        <span class="ext-icon">≡ƒôÜ</span>
         <div>
           <h2 class="ext-title">AI Learning Modules</h2>
           <p class="ext-subtitle">Learn Hindi, Sanskrit, and Gurunath's teachings with AI. Revenue supports the ashram.</p>
@@ -451,9 +451,9 @@ function renderNatureGuide() {
   return `
     <div class="ext-content">
       <div class="ext-header">
-        <span class="ext-icon">🌿</span>
+        <span class="ext-icon">≡ƒî┐</span>
         <div>
-          <h2 class="ext-title">Ashram Nature Guide — ${mod.price}</h2>
+          <h2 class="ext-title">Ashram Nature Guide ΓÇö ${mod.price}</h2>
           <p class="ext-subtitle">Discover the flora, fauna & wildlife of Gurunath's ashram region in Maharashtra, India</p>
         </div>
       </div>
@@ -478,14 +478,14 @@ function renderModuleCard(m) {
       <div class="module-price" style="color:${m.color}">${m.price}</div>
       <p class="module-desc">${escapeHtml(m.description)}</p>
       <ul class="module-features">
-        ${m.features.map(f => `<li>✓ ${escapeHtml(f)}</li>`).join('')}
+        ${m.features.map(f => `<li>Γ£ô ${escapeHtml(f)}</li>`).join('')}
       </ul>
       <div class="module-demo">
         <div class="module-demo-label">Sample lesson:</div>
         ${samples}
       </div>
       <button class="module-btn" style="background:${m.color}" data-module-id="${m.id}">
-        Start Learning — ${m.price}
+        Start Learning ΓÇö ${m.price}
       </button>
     </div>
   `;
@@ -493,44 +493,44 @@ function renderModuleCard(m) {
 
 function renderNatureGuideContent() {
   const trees = [
-    { name: 'Peepal (Sacred Fig)', latin: 'Ficus religiosa', emoji: '🌳', desc: 'Sacred tree under which Buddha attained enlightenment. Heart-shaped leaves, massive canopy. Found near temples.', use: 'Sacred, shade, oxygen' },
-    { name: 'Banyan Tree', latin: 'Ficus benghalensis', emoji: '🌲', desc: 'India\'s national tree. Sends aerial roots that become new trunks. Can live thousands of years. Ancient symbol of immortality.', use: 'Sacred, meditation seat' },
-    { name: 'Neem', latin: 'Azadirachta indica', emoji: '🌿', desc: 'Bitter leaves used for ayurvedic medicine, tooth cleaning, pest control. Produces small white flowers and olive-like fruits.', use: 'Medicine, purification' },
-    { name: 'Mango', latin: 'Mangifera indica', emoji: '🥭', desc: 'India\'s national fruit. Ashrams often have mango groves. Sweet seasonal fruit in summer (April-June). Leaves used in Hindu rituals.', use: 'Food, ritual, shade' },
-    { name: 'Coconut Palm', latin: 'Cocos nucifera', emoji: '🌴', desc: 'Provides coconut water, oil, and fiber. Essential in Hindu rituals and puja. Tall, unmistakable silhouette.', use: 'Food, ritual, oil' },
-    { name: 'Bel Tree', latin: 'Aegle marmelos', emoji: '🍋', desc: 'Sacred to Lord Shiva. Three-leaflet leaves offered in puja. Fruits are used medicinally for digestion. Found near Shiva temples.', use: 'Sacred to Shiva, medicine' },
+    { name: 'Peepal (Sacred Fig)', latin: 'Ficus religiosa', emoji: '≡ƒî│', desc: 'Sacred tree under which Buddha attained enlightenment. Heart-shaped leaves, massive canopy. Found near temples.', use: 'Sacred, shade, oxygen' },
+    { name: 'Banyan Tree', latin: 'Ficus benghalensis', emoji: '≡ƒî▓', desc: 'India\'s national tree. Sends aerial roots that become new trunks. Can live thousands of years. Ancient symbol of immortality.', use: 'Sacred, meditation seat' },
+    { name: 'Neem', latin: 'Azadirachta indica', emoji: '≡ƒî┐', desc: 'Bitter leaves used for ayurvedic medicine, tooth cleaning, pest control. Produces small white flowers and olive-like fruits.', use: 'Medicine, purification' },
+    { name: 'Mango', latin: 'Mangifera indica', emoji: '≡ƒÑ¡', desc: 'India\'s national fruit. Ashrams often have mango groves. Sweet seasonal fruit in summer (April-June). Leaves used in Hindu rituals.', use: 'Food, ritual, shade' },
+    { name: 'Coconut Palm', latin: 'Cocos nucifera', emoji: '≡ƒî┤', desc: 'Provides coconut water, oil, and fiber. Essential in Hindu rituals and puja. Tall, unmistakable silhouette.', use: 'Food, ritual, oil' },
+    { name: 'Bel Tree', latin: 'Aegle marmelos', emoji: '≡ƒìï', desc: 'Sacred to Lord Shiva. Three-leaflet leaves offered in puja. Fruits are used medicinally for digestion. Found near Shiva temples.', use: 'Sacred to Shiva, medicine' },
   ];
 
   const flowers = [
-    { name: 'Lotus', emoji: '🌸', desc: 'Symbol of spiritual purity — grows in mud but blooms beautifully. Sacred to Brahma, Vishnu, and Lakshmi. White and pink varieties.' },
-    { name: 'Jasmine (Mogra)', emoji: '🌼', desc: 'Intensely fragrant white flowers used in puja and offered to deities. Strung into garlands for abishek ceremonies.' },
-    { name: 'Marigold (Genda)', emoji: '🌻', desc: 'Bright orange/yellow flowers used extensively in Hindu worship. Temple garlands, rangoli borders, and festival decorations.' },
-    { name: 'Hibiscus (Jaswand)', emoji: '🌺', desc: 'Red hibiscus is sacred to Goddess Kali and Ganesha. Used in puja offerings.' },
+    { name: 'Lotus', emoji: '≡ƒî╕', desc: 'Symbol of spiritual purity ΓÇö grows in mud but blooms beautifully. Sacred to Brahma, Vishnu, and Lakshmi. White and pink varieties.' },
+    { name: 'Jasmine (Mogra)', emoji: '≡ƒî╝', desc: 'Intensely fragrant white flowers used in puja and offered to deities. Strung into garlands for abishek ceremonies.' },
+    { name: 'Marigold (Genda)', emoji: '≡ƒî╗', desc: 'Bright orange/yellow flowers used extensively in Hindu worship. Temple garlands, rangoli borders, and festival decorations.' },
+    { name: 'Hibiscus (Jaswand)', emoji: '≡ƒî║', desc: 'Red hibiscus is sacred to Goddess Kali and Ganesha. Used in puja offerings.' },
   ];
 
   const birds = [
-    { name: 'Indian Paradise Flycatcher', emoji: '🐦', desc: 'Male has spectacular long white tail (up to 30cm). Calls: sharp "tchwei tchwei". Found in wooded areas. Sacred bird of Maharashtra.' },
-    { name: 'Asian Koel', emoji: '🎵', desc: 'Famous for its melodious rising call. Male is all-black, female is brown-spotted. Arrives with monsoon. Symbol of spring.' },
-    { name: 'Spotted Owlet', emoji: '🦉', desc: 'Small brown owl with white spots, active at dusk. Often seen near old buildings. Considered auspicious in Hindu culture.' },
-    { name: 'Common Myna', emoji: '🐦', desc: 'Bold brown bird with yellow beak and eye patches. Excellent mimic. Lives near humans. Pairs for life — symbol of fidelity.' },
-    { name: 'Green Bee-eater', emoji: '💚', desc: 'Brilliant green with a long tail and blue throat. Often perches on wires in the sun. Catches insects in mid-air.' },
+    { name: 'Indian Paradise Flycatcher', emoji: '≡ƒÉª', desc: 'Male has spectacular long white tail (up to 30cm). Calls: sharp "tchwei tchwei". Found in wooded areas. Sacred bird of Maharashtra.' },
+    { name: 'Asian Koel', emoji: '≡ƒÄ╡', desc: 'Famous for its melodious rising call. Male is all-black, female is brown-spotted. Arrives with monsoon. Symbol of spring.' },
+    { name: 'Spotted Owlet', emoji: '≡ƒªë', desc: 'Small brown owl with white spots, active at dusk. Often seen near old buildings. Considered auspicious in Hindu culture.' },
+    { name: 'Common Myna', emoji: '≡ƒÉª', desc: 'Bold brown bird with yellow beak and eye patches. Excellent mimic. Lives near humans. Pairs for life ΓÇö symbol of fidelity.' },
+    { name: 'Green Bee-eater', emoji: '≡ƒÆÜ', desc: 'Brilliant green with a long tail and blue throat. Often perches on wires in the sun. Catches insects in mid-air.' },
   ];
 
   const animals = [
-    { name: 'Langur Monkey', emoji: '🐒', desc: 'Sacred grey langurs (Hanuman Langurs) are common near ashrams. Considered sacred as they are associated with Hanuman. Treat with respect.' },
-    { name: 'Indian Cobra', emoji: '🐍', desc: 'Sacred to Lord Shiva (worn around neck in iconography). Present in rural Maharashtra. Give space, never disturb. Symbol of kundalini energy.' },
-    { name: 'Indian Peacock', emoji: '🦚', desc: 'National bird of India. Sacred to Lord Murugan and Saraswati. Displays stunning tail feathers during monsoon mating season.' },
-    { name: 'Mongoose', emoji: '🦡', desc: 'Small brown mammal, excellent at catching snakes. Associated with Kubera (wealth). Seen darting through garden undergrowth.' },
+    { name: 'Langur Monkey', emoji: '≡ƒÉÆ', desc: 'Sacred grey langurs (Hanuman Langurs) are common near ashrams. Considered sacred as they are associated with Hanuman. Treat with respect.' },
+    { name: 'Indian Cobra', emoji: '≡ƒÉì', desc: 'Sacred to Lord Shiva (worn around neck in iconography). Present in rural Maharashtra. Give space, never disturb. Symbol of kundalini energy.' },
+    { name: 'Indian Peacock', emoji: '≡ƒªÜ', desc: 'National bird of India. Sacred to Lord Murugan and Saraswati. Displays stunning tail feathers during monsoon mating season.' },
+    { name: 'Mongoose', emoji: '≡ƒªí', desc: 'Small brown mammal, excellent at catching snakes. Associated with Kubera (wealth). Seen darting through garden undergrowth.' },
   ];
 
   return `
     <div class="nature-teaser">
       <div class="nature-teaser-badge">Free Preview</div>
       <div class="nature-tabs" id="nature-tabs">
-        <button class="nature-tab active" data-nature-tab="trees">🌳 Trees</button>
-        <button class="nature-tab" data-nature-tab="flowers">🌸 Flowers</button>
-        <button class="nature-tab" data-nature-tab="birds">🐦 Birds</button>
-        <button class="nature-tab" data-nature-tab="animals">🐒 Animals</button>
+        <button class="nature-tab active" data-nature-tab="trees">≡ƒî│ Trees</button>
+        <button class="nature-tab" data-nature-tab="flowers">≡ƒî╕ Flowers</button>
+        <button class="nature-tab" data-nature-tab="birds">≡ƒÉª Birds</button>
+        <button class="nature-tab" data-nature-tab="animals">≡ƒÉÆ Animals</button>
       </div>
       <div id="nature-tab-trees" class="nature-tab-content">
         ${trees.map(t => `
@@ -579,16 +579,16 @@ function renderNatureGuideContent() {
         `).join('')}
       </div>
       <div class="nature-cta">
-        <div class="nature-cta-text">📚 Full guide includes 50+ trees, 40+ birds, medicinal plants, monsoon guide, and AI identification tool</div>
-        <button class="module-btn" style="background:#2d7d32">Access Full Nature Guide — $10/month</button>
+        <div class="nature-cta-text">≡ƒôÜ Full guide includes 50+ trees, 40+ birds, medicinal plants, monsoon guide, and AI identification tool</div>
+        <button class="module-btn" style="background:#2d7d32">Access Full Nature Guide ΓÇö $10/month</button>
       </div>
     </div>
   `;
 }
 
-// ══════════════════════════════════════════════════════
-// SHIVRAJ PRIVATE SECTION 🔒
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// SHIVRAJ PRIVATE SECTION ≡ƒöÆ
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 let shivrajUnlocked = false;
 const SHIVRAJ_CODE = 'shivraj2026';
 
@@ -596,8 +596,8 @@ function renderShivrajSection() {
   return `
     <div class="ext-content">
       <div id="shivraj-lock" class="shivraj-lock">
-        <div class="lock-icon">🔒</div>
-        <h2>Shivraj Sitole — Private Workspace</h2>
+        <div class="lock-icon">≡ƒöÆ</div>
+        <h2>Shivraj Sitole ΓÇö Private Workspace</h2>
         <p>This section is restricted. Enter your access code to continue.</p>
         <div class="lock-form">
           <input type="password" id="shivraj-code-input" placeholder="Enter access code" />
@@ -606,30 +606,30 @@ function renderShivrajSection() {
         <div id="shivraj-error" class="shivraj-error" style="display:none">Incorrect code. Contact Shivraj for access.</div>
       </div>
       <div id="shivraj-content" style="display:none">
-        <h2>🔓 Welcome, Shivraj</h2>
+        <h2>≡ƒöô Welcome, Shivraj</h2>
         <div class="shivraj-notes">
           <div class="shivraj-note">
-            <h3>⚡ Electrical Design Recommendations</h3>
+            <h3>ΓÜí Electrical Design Recommendations</h3>
             <ul>
-              <li>Exposed wiring in main hall — URGENT safety hazard</li>
+              <li>Exposed wiring in main hall ΓÇö URGENT safety hazard</li>
               <li>Full electrical audit needed before retreat season</li>
               <li>Volunteers can supervise only, not do live wiring</li>
-              <li>Rewiring estimate for guest rooms: ₹80,000-1,20,000</li>
-              <li>Ground all circuits properly — earth leakage is a real risk</li>
+              <li>Rewiring estimate for guest rooms: Γé╣80,000-1,20,000</li>
+              <li>Ground all circuits properly ΓÇö earth leakage is a real risk</li>
             </ul>
           </div>
           <div class="shivraj-note">
-            <h3>🏗️ Civil Works Priority</h3>
+            <h3>≡ƒÅù∩╕Å Civil Works Priority</h3>
             <ul>
               <li>Drainage redesign: French drains, trenching, soakaways</li>
-              <li>Water tank float valve automation: ₹5,000/tank</li>
-              <li>Estimated drainage project total: ₹2-3 crore</li>
+              <li>Water tank float valve automation: Γé╣5,000/tank</li>
+              <li>Estimated drainage project total: Γé╣2-3 crore</li>
               <li>Must fix drainage BEFORE solar panels or landscaping</li>
               <li>Monsoon habitability is currently impossible without this</li>
             </ul>
           </div>
           <div class="shivraj-note">
-            <h3>📋 Project Tier Framework</h3>
+            <h3>≡ƒôï Project Tier Framework</h3>
             <p>Tier 1 (Volunteer Safe): Painting, gardening, cleaning, carpentry<br>
             Tier 2 (Expert Supervised): Tile work, basic plumbing fixtures<br>
             Tier 3 (Professional Only): Structural, live wiring, drainage design</p>
@@ -640,9 +640,9 @@ function renderShivrajSection() {
   `;
 }
 
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // EVENT LISTENERS
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function setupExtensionListeners() {
   document.addEventListener('click', (e) => {
     // Extension tab switching
@@ -677,7 +677,7 @@ function setupExtensionListeners() {
     // Module buttons
     if (e.target.matches('[data-module-id]')) {
       const id = e.target.dataset.moduleId;
-      alert(`🌟 ${id.charAt(0).toUpperCase() + id.slice(1)} module coming soon!\n\nPayment integration and AI backend will be wired up. Check back next release.`);
+      alert(`≡ƒîƒ ${id.charAt(0).toUpperCase() + id.slice(1)} module coming soon!\n\nPayment integration and AI backend will be wired up. Check back next release.`);
     }
   });
 
@@ -727,7 +727,7 @@ function claimGurumataTask(taskId) {
   if (taskCard) {
     const actionsDiv = taskCard.querySelector('.gm-task-actions');
     if (actionsDiv) {
-      actionsDiv.innerHTML = `<div class="gm-claimed">🙏 Claimed by <strong>${escapeHtml(name)}</strong> — Jai Gurunath!</div>`;
+      actionsDiv.innerHTML = `<div class="gm-claimed">≡ƒÖÅ Claimed by <strong>${escapeHtml(name)}</strong> ΓÇö Jai Gurunath!</div>`;
     }
     const statusBadge = taskCard.querySelector('.gm-badge-pending');
     if (statusBadge) { statusBadge.textContent = 'claimed'; statusBadge.className = 'gm-badge gm-badge-claimed'; }
@@ -746,9 +746,9 @@ function unlockShivraj() {
   }
 }
 
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // UTILITY
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -759,119 +759,117 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // STYLES (injected inline to avoid extra CSS file)
-// ══════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function renderExtStyles() {
   return `<style>
-/* ── Google Auth ── */
-#sk-auth-div { padding: 0.5rem 1.5rem; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,215,0,0.2); display: flex; justify-content: flex-end; position: relative; z-index: 100; }
+/* ΓöÇΓöÇ Google Auth ΓöÇΓöÇ */
+#sk-auth-div { padding: 0.5rem 1rem; background: #ffffee; border-bottom: 1px solid #d9bfb7; display: flex; justify-content: flex-end; }
 #sk-auth-container { display: flex; align-items: center; gap: 0.75rem; }
-#sk-auth-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.2rem; background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.4); color: #ffd700; font-size: 0.8rem; font-weight: 600; cursor: pointer; border-radius: 20px; transition: all 0.2s; }
-#sk-auth-btn:hover { background: rgba(255,215,0,0.25); border-color: #ffd700; }
+#sk-auth-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: white; border: 1px solid #d9bfb7; color: #34345c; font-size: 0.8rem; font-weight: 600; cursor: pointer; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: box-shadow 0.2s; }
+#sk-auth-btn:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
 #sk-user-info { display: flex; align-items: center; gap: 0.5rem; }
-#sk-user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ffd700; }
-#sk-user-name { font-size: 0.8rem; font-weight: 600; color: #ffd700; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#sk-signout-btn { font-size: 0.7rem; padding: 0.25rem 0.6rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #e0e0e0; cursor: pointer; border-radius: 10px; }
-#sk-signout-btn:hover { background: rgba(255,255,255,0.2); }
+#sk-user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #117743; }
+#sk-user-name { font-size: 0.8rem; font-weight: 600; color: #34345c; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#sk-signout-btn { font-size: 0.7rem; padding: 0.25rem 0.6rem; background: #f0e0d6; border: 1px solid #d9bfb7; color: #34345c; cursor: pointer; border-radius: 3px; }
+#sk-signout-btn:hover { background: #e0cfc6; }
 
-/* ── Extension Container ── */
-#sk-extensions { margin-top: 1rem; }
+/* ΓöÇΓöÇ Extension Container ΓöÇΓöÇ */
+#sk-extensions { margin-top: 2rem; }
 
-/* ── Extension Nav ── */
-.ext-nav { background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255,215,0,0.2); border-radius: 15px; padding: 1.2rem 1.5rem; margin-bottom: 0; }
-.ext-nav-title { font-size: 0.75rem; font-weight: 700; color: #ffd700; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.75rem; }
+/* ΓöÇΓöÇ Extension Nav ΓöÇΓöÇ */
+.ext-nav { background: rgba(255,255,238,0.95); border: 1px solid #d9bfb7; padding: 1.2rem; margin-bottom: 0; }
+.ext-nav-title { font-size: 0.8rem; font-weight: 700; color: #34345c; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
 .ext-nav-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.ext-tab-btn { padding: 0.5rem 1rem; font-size: 0.75rem; border: 1px solid rgba(255,215,0,0.3); background: rgba(255,255,255,0.06); color: #e0e0e0; cursor: pointer; border-radius: 20px; transition: all 0.2s; }
-.ext-tab-btn.active, .ext-tab-btn:hover { background: rgba(255,215,0,0.2); color: #ffd700; border-color: rgba(255,215,0,0.6); }
+.ext-tab-btn { padding: 0.5rem 1rem; font-size: 0.75rem; border: 1px solid #d9bfb7; background: #ffffee; color: #34345c; cursor: pointer; border-radius: 20px; transition: all 0.2s; }
+.ext-tab-btn.active, .ext-tab-btn:hover { background: #34345c; color: white; border-color: #34345c; }
 
-/* ── Ext Section ── */
-.ext-section { background: rgba(255,255,255,0.06); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 1.5rem; margin-top: 0; }
-.ext-content { max-width: 960px; margin: 0 auto; }
+/* ΓöÇΓöÇ Ext Section ΓöÇΓöÇ */
+.ext-section { background: #ffffee; border: 1px solid #d9bfb7; padding: 1.5rem; }
+.ext-content { max-width: 900px; margin: 0 auto; }
 .ext-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
 .ext-icon { font-size: 2.5rem; line-height: 1; }
-.ext-title { font-size: 1.4rem; font-weight: 700; color: #ffd700; margin: 0 0 0.25rem; }
-.ext-subtitle { font-size: 0.85rem; color: rgba(224,224,224,0.7); margin: 0; }
+.ext-title { font-size: 1.4rem; font-weight: 700; color: #34345c; margin: 0 0 0.25rem; }
+.ext-subtitle { font-size: 0.85rem; color: #34345c99; margin: 0; }
 
-/* ── Gurumata's Will ── */
-.gm-tribute { background: rgba(255,215,0,0.08); border-left: 4px solid #ffd700; padding: 1rem 1.5rem; margin-bottom: 1rem; font-style: italic; color: #e0e0e0; border-radius: 0 8px 8px 0; }
+/* ΓöÇΓöÇ Gurumata's Will ΓöÇΓöÇ */
+.gm-tribute { background: #f0e0d6; border-left: 4px solid #c41e3a; padding: 1rem 1.5rem; margin-bottom: 1rem; font-style: italic; color: #34345c; }
 .gm-tribute-text { font-size: 0.9rem; }
-.gm-alert { background: rgba(255,193,7,0.15); border: 1px solid rgba(255,193,7,0.4); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; color: #ffd700; margin-bottom: 1.5rem; }
+.gm-alert { background: #fff3cd; border: 1px solid #ffc107; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.85rem; color: #856404; margin-bottom: 1.5rem; }
 .gm-tasks { display: flex; flex-direction: column; gap: 1rem; }
-.gm-task { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); padding: 1.25rem; border-radius: 12px; }
-.gm-task-title { font-size: 1rem; font-weight: 700; color: #ffd700; margin: 0 0 0.5rem; }
+.gm-task { background: #f0e0d6; border: 1px solid #d9bfb7; padding: 1.25rem; }
+.gm-task-title { font-size: 1rem; font-weight: 700; color: #34345c; margin: 0 0 0.5rem; }
 .gm-task-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
 .gm-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 10px; font-weight: 600; text-transform: uppercase; }
-.gm-badge-high { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.4); }
-.gm-badge-medium { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid rgba(251,146,60,0.4); }
-.gm-badge-type { background: rgba(255,215,0,0.15); color: #ffd700; border: 1px solid rgba(255,215,0,0.3); }
-.gm-badge-pending { background: rgba(255,255,255,0.1); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.2); }
-.gm-badge-claimed { background: rgba(74,222,128,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.4); }
-.gm-task-desc { font-size: 0.85rem; color: rgba(224,224,224,0.8); line-height: 1.6; margin-bottom: 1rem; }
+.gm-badge-high { background: #c41e3a22; color: #c41e3a; border: 1px solid #c41e3a55; }
+.gm-badge-medium { background: #ffa50022; color: #cc7700; border: 1px solid #ffa50055; }
+.gm-badge-type { background: #34345c22; color: #34345c; border: 1px solid #34345c55; }
+.gm-badge-pending { background: #d6daf0; color: #34345c; border: 1px solid #b7c5d9; }
+.gm-badge-claimed { background: #11774322; color: #117743; border: 1px solid #11774355; }
+.gm-task-desc { font-size: 0.85rem; color: #34345c; line-height: 1.6; margin-bottom: 1rem; }
 .gm-task-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.gm-claim-input { flex: 1; min-width: 200px; padding: 0.5rem 0.75rem; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #e0e0e0; border-radius: 8px; }
-.gm-claim-input::placeholder { color: rgba(255,255,255,0.4); }
-.gm-claim-btn { padding: 0.5rem 1rem; font-size: 0.8rem; background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.4); color: #ffd700; cursor: pointer; white-space: nowrap; border-radius: 8px; }
-.gm-claim-btn:hover { background: rgba(255,215,0,0.25); }
-.gm-claimed { font-size: 0.85rem; color: #4ade80; font-style: italic; padding: 0.5rem 0; }
+.gm-claim-input { flex: 1; min-width: 200px; padding: 0.5rem 0.75rem; font-size: 0.8rem; border: 1px solid #d9bfb7; background: #ffffee; color: #34345c; }
+.gm-claim-btn { padding: 0.5rem 1rem; font-size: 0.8rem; background: #d6daf0; border: 1px solid #b7c5d9; color: #34345c; cursor: pointer; white-space: nowrap; }
+.gm-claim-btn:hover { background: #eef2ff; }
+.gm-claimed { font-size: 0.85rem; color: #117743; font-style: italic; padding: 0.5rem 0; }
 
-/* ── Store ── */
-.store-info { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.2); padding: 0.75rem 1rem; font-size: 0.8rem; color: #e0e0e0; margin-bottom: 1rem; border-radius: 8px; }
+/* ΓöÇΓöÇ Store ΓöÇΓöÇ */
+.store-info { background: #f0e0d6; border: 1px solid #d9bfb7; padding: 0.75rem 1rem; font-size: 0.8rem; color: #34345c; margin-bottom: 1rem; }
 .store-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
-.store-filter-btn { padding: 0.35rem 0.9rem; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #e0e0e0; cursor: pointer; border-radius: 20px; }
-.store-filter-btn.active { background: rgba(255,215,0,0.2); color: #ffd700; border-color: rgba(255,215,0,0.5); }
+.store-filter-btn { padding: 0.35rem 0.9rem; font-size: 0.75rem; border: 1px solid #d9bfb7; background: #ffffee; color: #34345c; cursor: pointer; border-radius: 20px; }
+.store-filter-btn.active { background: #34345c; color: white; border-color: #34345c; }
 .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
-.store-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); padding: 1rem; text-align: center; display: flex; flex-direction: column; gap: 0.3rem; border-radius: 12px; }
+.store-card { background: #f0e0d6; border: 1px solid #d9bfb7; padding: 1rem; text-align: center; display: flex; flex-direction: column; gap: 0.3rem; }
 .store-emoji { font-size: 2rem; }
-.store-name { font-size: 0.8rem; font-weight: 600; color: #ffd700; }
-.store-cat { font-size: 0.65rem; color: rgba(224,224,224,0.5); text-transform: uppercase; }
-.store-btn { display: block; margin-top: auto; padding: 0.5rem; background: #FF9900; color: white; font-size: 0.75rem; font-weight: 700; text-decoration: none; cursor: pointer; border-radius: 6px; }
+.store-name { font-size: 0.8rem; font-weight: 600; color: #34345c; }
+.store-cat { font-size: 0.65rem; color: #34345c88; text-transform: uppercase; }
+.store-btn { display: block; margin-top: auto; padding: 0.5rem; background: #FF9900; color: white; font-size: 0.75rem; font-weight: 700; text-decoration: none; cursor: pointer; }
 .store-btn:hover { background: #e88800; }
-.store-footer { text-align: center; font-size: 0.7rem; color: rgba(224,224,224,0.4); margin-top: 0.5rem; }
+.store-footer { text-align: center; font-size: 0.7rem; color: #34345c88; margin-top: 0.5rem; }
 
-/* ── Learning Modules ── */
+/* ΓöÇΓöÇ Learning Modules ΓöÇΓöÇ */
 .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
-.module-card { background: rgba(255,255,255,0.07); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.12); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; border-radius: 15px; }
+.module-card { background: #f0e0d6; border: 1px solid #d9bfb7; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
 .module-emoji { font-size: 2.5rem; }
-.module-title { font-size: 1.1rem; font-weight: 700; color: #ffd700; margin: 0; }
-.module-subtitle { font-size: 0.8rem; color: rgba(224,224,224,0.6); }
+.module-title { font-size: 1.1rem; font-weight: 700; color: #34345c; margin: 0; }
+.module-subtitle { font-size: 0.8rem; color: #34345c99; }
 .module-price { font-size: 1.2rem; font-weight: 700; }
-.module-desc { font-size: 0.82rem; color: rgba(224,224,224,0.85); line-height: 1.5; }
-.module-features { list-style: none; padding: 0; margin: 0; font-size: 0.78rem; color: rgba(224,224,224,0.8); }
+.module-desc { font-size: 0.82rem; color: #34345c; line-height: 1.5; }
+.module-features { list-style: none; padding: 0; margin: 0; font-size: 0.78rem; color: #34345c; }
 .module-features li { padding: 0.15rem 0; }
-.module-demo { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.75rem; margin-top: 0.25rem; border-radius: 8px; }
-.module-demo-label { font-size: 0.7rem; font-weight: 700; color: rgba(255,215,0,0.6); text-transform: uppercase; margin-bottom: 0.5rem; }
-.module-q { font-size: 0.78rem; color: #e0e0e0; font-weight: 600; }
-.module-a { font-size: 0.78rem; color: #4ade80; font-style: italic; margin-bottom: 0.5rem; }
-.module-btn { padding: 0.75rem; color: white; font-size: 0.85rem; font-weight: 700; border: none; cursor: pointer; margin-top: auto; border-radius: 8px; }
+.module-demo { background: #ffffee; border: 1px solid #d9bfb7; padding: 0.75rem; margin-top: 0.25rem; }
+.module-demo-label { font-size: 0.7rem; font-weight: 700; color: #34345c88; text-transform: uppercase; margin-bottom: 0.5rem; }
+.module-q { font-size: 0.78rem; color: #34345c; font-weight: 600; }
+.module-a { font-size: 0.78rem; color: #117743; font-style: italic; margin-bottom: 0.5rem; }
+.module-btn { padding: 0.75rem; color: white; font-size: 0.85rem; font-weight: 700; border: none; cursor: pointer; margin-top: auto; }
 .module-btn:hover { opacity: 0.9; }
 
-/* ── Nature Guide ── */
+/* ΓöÇΓöÇ Nature Guide ΓöÇΓöÇ */
 .nature-teaser { position: relative; }
-.nature-teaser-badge { display: inline-block; background: rgba(74,222,128,0.2); color: #4ade80; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 10px; margin-bottom: 0.75rem; text-transform: uppercase; border: 1px solid rgba(74,222,128,0.4); }
+.nature-teaser-badge { display: inline-block; background: #117743; color: white; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 10px; margin-bottom: 0.75rem; text-transform: uppercase; }
 .nature-tabs { display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
-.nature-tab { padding: 0.5rem 1rem; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #e0e0e0; cursor: pointer; border-radius: 20px; }
-.nature-tab.active { background: rgba(74,222,128,0.2); color: #4ade80; border-color: rgba(74,222,128,0.5); }
+.nature-tab { padding: 0.5rem 1rem; font-size: 0.8rem; border: 1px solid #d9bfb7; background: #ffffee; color: #34345c; cursor: pointer; border-radius: 20px; }
+.nature-tab.active { background: #117743; color: white; border-color: #117743; }
 .nature-tab-content { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
-.nature-card { display: flex; gap: 1rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 0.75rem; align-items: flex-start; border-radius: 10px; }
+.nature-card { display: flex; gap: 1rem; background: #f0e0d6; border: 1px solid #d9bfb7; padding: 0.75rem; align-items: flex-start; }
 .nature-emoji { font-size: 2rem; flex-shrink: 0; }
-.nature-name { font-weight: 700; font-size: 0.9rem; color: #ffd700; }
-.nature-latin { font-size: 0.75rem; color: rgba(224,224,224,0.5); font-style: italic; margin-bottom: 0.25rem; }
-.nature-desc { font-size: 0.8rem; color: rgba(224,224,224,0.85); line-height: 1.5; }
-.nature-use { font-size: 0.75rem; color: #4ade80; margin-top: 0.2rem; }
-.nature-cta { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); padding: 1rem; text-align: center; margin-top: 1rem; border-radius: 10px; }
-.nature-cta-text { font-size: 0.85rem; color: #e0e0e0; margin-bottom: 0.75rem; }
+.nature-name { font-weight: 700; font-size: 0.9rem; color: #34345c; }
+.nature-latin { font-size: 0.75rem; color: #34345c88; font-style: italic; margin-bottom: 0.25rem; }
+.nature-desc { font-size: 0.8rem; color: #34345c; line-height: 1.5; }
+.nature-use { font-size: 0.75rem; color: #117743; margin-top: 0.2rem; }
+.nature-cta { background: #1177431a; border: 1px solid #117743; padding: 1rem; text-align: center; margin-top: 1rem; }
+.nature-cta-text { font-size: 0.85rem; color: #34345c; margin-bottom: 0.75rem; }
 
-/* ── Shivraj ── */
-.shivraj-lock { text-align: center; padding: 3rem 1rem; color: #e0e0e0; }
+/* ΓöÇΓöÇ Shivraj ΓöÇΓöÇ */
+.shivraj-lock { text-align: center; padding: 3rem 1rem; }
 .lock-icon { font-size: 3rem; margin-bottom: 1rem; }
 .lock-form { display: flex; gap: 0.5rem; justify-content: center; margin: 1rem 0; flex-wrap: wrap; }
-.lock-form input { padding: 0.6rem 1rem; font-size: 0.9rem; border: 1px solid rgba(255,215,0,0.3); background: rgba(255,255,255,0.08); color: #e0e0e0; border-radius: 8px; }
-.shivraj-lock h2 { color: #ffd700; margin-bottom: 0.5rem; }
-.shivraj-error { color: #f87171; font-size: 0.85rem; }
+.lock-form input { padding: 0.6rem 1rem; font-size: 0.9rem; border: 1px solid #d9bfb7; background: #ffffee; color: #34345c; }
+.shivraj-error { color: #c41e3a; font-size: 0.85rem; }
 .shivraj-notes { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
-.shivraj-note { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); padding: 1rem; border-radius: 12px; }
-.shivraj-note h3 { font-size: 0.95rem; color: #ffd700; margin-bottom: 0.5rem; }
-.shivraj-note ul { font-size: 0.85rem; color: rgba(224,224,224,0.85); padding-left: 1.5rem; line-height: 1.8; }
+.shivraj-note { background: #f0e0d6; border: 1px solid #d9bfb7; padding: 1rem; }
+.shivraj-note h3 { font-size: 0.95rem; color: #34345c; margin-bottom: 0.5rem; }
+.shivraj-note ul { font-size: 0.85rem; color: #34345c; padding-left: 1.5rem; line-height: 1.8; }
   </style>`;
 }
