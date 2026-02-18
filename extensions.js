@@ -71,13 +71,8 @@ function injectAuthButton() {
     </div>
   `;
 
-  // Try to insert before the first section or at the top of the app
-  const firstSection = document.querySelector('.billboard-container') || document.querySelector('.yoga-marathon-app');
-  if (firstSection && firstSection.parentNode) {
-    firstSection.parentNode.insertBefore(authDiv, firstSection);
-  } else {
-    document.body.prepend(authDiv);
-  }
+  // Insert OUTSIDE #app so it survives renderApp() re-renders
+  document.body.insertBefore(authDiv, document.body.firstChild);
 }
 
 function updateAuthUI(user) {
