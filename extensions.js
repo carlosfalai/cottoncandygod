@@ -1,8 +1,128 @@
 /**
  * Siddhanath Kriya Yoga — Extensions
- * Adds: Gurumata's Will, Amazon Store, Learning Modules, Nature Guide, Shivraj Section
+ * Adds: Google Auth, Gurumata's Will, Amazon Store, Learning Modules, Nature Guide, Shivraj
  * Injected AFTER app.js initializes.
  */
+
+// ══════════════════════════════════════════════════════
+// GOOGLE AUTH (Supabase OAuth)
+// ══════════════════════════════════════════════════════
+let currentUser = null;
+
+function getSupabase() {
+  // Wait for the main app's Supabase client
+  const app = window._yogaApp || (window._yogaApp = null);
+  // Access via window.supabase or app's client
+  if (window._supabaseExt) return window._supabaseExt;
+  const url = 'https://gbxksgxezbljwlnlpkpz.supabase.co';
+  const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdieGtzZ3hlemJsandsbmxwa3B6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3NTE1ODksImV4cCI6MjA2NDMyNzU4OX0.MCZ9NTKCUe8DLwXz8Cy2-Qr-KYPpq-tn376dpjQ6HxM';
+  if (window.supabase && window.supabase.createClient) {
+    window._supabaseExt = window.supabase.createClient(url, key);
+    return window._supabaseExt;
+  }
+  return null;
+}
+
+async function initGoogleAuth() {
+  // Inject auth button into header
+  injectAuthButton();
+
+  // Check current session
+  const sb = getSupabase();
+  if (!sb) return;
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    updateAuthUI(session.user);
+  }
+
+  // Listen for auth changes
+  sb.auth.onAuthStateChange((event, session) => {
+    currentUser = session?.user || null;
+    updateAuthUI(currentUser);
+    if (event === 'SIGNED_IN') {
+      upsertHamsaProfile(currentUser);
+    }
+  });
+}
+
+function injectAuthButton() {
+  // Find the header nav area
+  const header = document.querySelector('.app-header') || document.querySelector('header') || document.querySelector('.yoga-marathon-app');
+  if (!header) return;
+
+  // Check if already injected
+  if (document.getElementById('sk-auth-btn')) return;
+
+  const authDiv = document.createElement('div');
+  authDiv.id = 'sk-auth-div';
+  authDiv.innerHTML = `
+    <div id="sk-auth-container">
+      <div id="sk-user-info" style="display:none">
+        <img id="sk-user-avatar" src="" alt="Profile" />
+        <span id="sk-user-name"></span>
+        <button id="sk-signout-btn" onclick="signOutGoogle()">Sign Out</button>
+      </div>
+      <button id="sk-auth-btn" onclick="signInGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        Sign in with Google
+      </button>
+    </div>
+  `;
+
+  // Try to insert before the first section or at the top of the app
+  const firstSection = document.querySelector('.billboard-container') || document.querySelector('.yoga-marathon-app');
+  if (firstSection && firstSection.parentNode) {
+    firstSection.parentNode.insertBefore(authDiv, firstSection);
+  } else {
+    document.body.prepend(authDiv);
+  }
+}
+
+function updateAuthUI(user) {
+  const btn = document.getElementById('sk-auth-btn');
+  const userInfo = document.getElementById('sk-user-info');
+  const avatar = document.getElementById('sk-user-avatar');
+  const nameEl = document.getElementById('sk-user-name');
+
+  if (user) {
+    if (btn) btn.style.display = 'none';
+    if (userInfo) userInfo.style.display = 'flex';
+    if (avatar) avatar.src = user.user_metadata?.avatar_url || '';
+    if (nameEl) nameEl.textContent = user.user_metadata?.full_name || user.email || '';
+  } else {
+    if (btn) btn.style.display = 'flex';
+    if (userInfo) userInfo.style.display = 'none';
+  }
+}
+
+async function signInGoogle() {
+  const sb = getSupabase();
+  if (!sb) { alert('Loading... try again in a second'); return; }
+  const redirectTo = window.location.origin;
+  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+}
+
+async function signOutGoogle() {
+  const sb = getSupabase();
+  if (sb) await sb.auth.signOut();
+  currentUser = null;
+  updateAuthUI(null);
+}
+
+async function upsertHamsaProfile(user) {
+  const sb = getSupabase();
+  if (!sb || !user) return;
+  try {
+    await sb.from('hamsa_profiles').upsert({
+      id: user.id,
+      name: user.user_metadata?.full_name || user.email,
+      email: user.email,
+      available_for_seva: true,
+    }, { onConflict: 'id', ignoreDuplicates: false });
+  } catch (e) { /* table may not exist on this Supabase project */ }
+}
 
 // Wait for the main app to initialize, then inject new sections
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,7 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const app = document.querySelector('.yoga-marathon-app');
     if (app || attempts++ > 30) {
       clearInterval(waitForApp);
-      if (app) injectExtensions();
+      if (app) {
+        injectExtensions();
+        setTimeout(initGoogleAuth, 1500); // wait for Supabase client to init
+      }
     }
   }, 300);
 });
@@ -646,6 +769,17 @@ function escapeHtml(str) {
 // ══════════════════════════════════════════════════════
 function renderExtStyles() {
   return `<style>
+/* ── Google Auth ── */
+#sk-auth-div { padding: 0.5rem 1rem; background: #ffffee; border-bottom: 1px solid #d9bfb7; display: flex; justify-content: flex-end; }
+#sk-auth-container { display: flex; align-items: center; gap: 0.75rem; }
+#sk-auth-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: white; border: 1px solid #d9bfb7; color: #34345c; font-size: 0.8rem; font-weight: 600; cursor: pointer; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: box-shadow 0.2s; }
+#sk-auth-btn:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+#sk-user-info { display: flex; align-items: center; gap: 0.5rem; }
+#sk-user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #117743; }
+#sk-user-name { font-size: 0.8rem; font-weight: 600; color: #34345c; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#sk-signout-btn { font-size: 0.7rem; padding: 0.25rem 0.6rem; background: #f0e0d6; border: 1px solid #d9bfb7; color: #34345c; cursor: pointer; border-radius: 3px; }
+#sk-signout-btn:hover { background: #e0cfc6; }
+
 /* ── Extension Container ── */
 #sk-extensions { margin-top: 2rem; }
 
