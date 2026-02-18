@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Kriya Yoga Practice Timer — Siddhanath</title>
+    <link rel="icon" href="./generated-icon.png">
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-dim: rgba(255,215,0,0.15);
+            --gold-border: rgba(255,215,0,0.3);
+            --navy: #1a1a2e;
+            --navy2: #16213e;
+            --navy3: #0f3460;
+            --glass: rgba(255,255,255,0.08);
+            --glass-border: rgba(255,255,255,0.15);
+            --text: #e0e0e0;
+            --green: #4ade80;
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 50%, var(--navy3) 100%);
+            background-attachment: fixed;
+            color: var(--text);
+            overscroll-behavior: none;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 24px 0 16px;
+        }
+        header img { width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 10px; }
+        header h1 { font-size: 1.4rem; font-weight: 700; background: linear-gradient(45deg, var(--gold), #ffed4e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        header p { font-size: 0.8rem; opacity: 0.6; margin-top: 4px; }
+
+        /* Timer Display */
+        .timer-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px 20px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .current-technique {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 6px;
+            min-height: 1.6em;
+        }
+
+        .step-indicator {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            margin-bottom: 24px;
+        }
+
+        .time-display {
+            font-size: 4.5rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 16px;
+            font-variant-numeric: tabular-nums;
+        }
+        .time-display.warning { color: #fb923c; }
+        .time-display.done { color: var(--green); }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), #ffed4e);
+            border-radius: 3px;
+            transition: width 1s linear;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-user-select: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--gold), #ffed4e);
+            color: var(--navy);
+            flex: 1;
+            max-width: 180px;
+        }
+        .btn-primary:active { transform: scale(0.96); }
+
+        .btn-secondary {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text);
+            padding: 14px 18px;
+        }
+        .btn-secondary:active { transform: scale(0.96); opacity: 0.7; }
+
+        /* Sequence List */
+        .sequence-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .sequence-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .sequence-title { font-size: 0.85rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; }
+        .total-time { font-size: 0.8rem; opacity: 0.5; }
+
+        .technique-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            gap: 10px;
+        }
+        .technique-row:last-child { border-bottom: none; }
+
+        .technique-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-border);
+            background: var(--gold-dim);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--gold);
+            cursor: pointer;
+        }
+        .technique-check.active { background: rgba(255,215,0,0.3); border-color: var(--gold); }
+        .technique-check.done { background: rgba(74,222,128,0.2); border-color: var(--green); color: var(--green); }
+
+        .technique-name { flex: 1; font-size: 0.9rem; }
+        .technique-name.active { color: var(--gold); font-weight: 600; }
+        .technique-name.done { opacity: 0.4; text-decoration: line-through; }
+
+        .technique-duration {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            min-width: 40px;
+            text-align: right;
+        }
+        .technique-duration input {
+            width: 36px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            padding: 2px 4px;
+            font-size: 0.8rem;
+        }
+
+        /* Add technique */
+        .add-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .add-row input {
+            flex: 1;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: white;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+        .add-row input::placeholder { opacity: 0.4; }
+        .btn-add {
+            padding: 8px 16px;
+            background: var(--gold-dim);
+            border: 1px solid var(--gold-border);
+            color: var(--gold);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-add:active { opacity: 0.7; }
+
+        /* Complete message */
+        .complete-card {
+            background: rgba(74,222,128,0.1);
+            border: 1px solid rgba(74,222,128,0.3);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            display: none;
+            margin-bottom: 16px;
+        }
+        .complete-card.show { display: block; }
+        .complete-card h2 { color: var(--green); font-size: 1.4rem; margin-bottom: 8px; }
+        .complete-card p { opacity: 0.7; font-size: 0.9rem; }
+
+        /* Back link */
+        .back-link {
+            text-align: center;
+            margin-top: 24px;
+        }
+        .back-link a { color: rgba(255,215,0,0.5); font-size: 0.8rem; text-decoration: none; }
+        .back-link a:hover { color: var(--gold); }
+
+        /* Responsive tweaks */
+        @media (min-width: 600px) {
+            .container { padding: 32px 20px 60px; }
+            .time-display { font-size: 6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <img src="./generated-icon.png" alt="Siddhanath">
+        <h1>🧘 Kriya Yoga Timer</h1>
+        <p>Yogiraj Siddhanath Practice Sequence</p>
+    </header>
+
+    <!-- Complete message -->
+    <div class="complete-card" id="complete-card">
+        <h2>🙏 Practice Complete</h2>
+        <p>Stay in stillness. Let the energy settle.<br>Jai Gurunath.</p>
+    </div>
+
+    <!-- Timer display -->
+    <div class="timer-card">
+        <div class="current-technique" id="current-name">Omkar Kriya</div>
+        <div class="step-indicator" id="step-indicator">Step 1 of 6 · Total: 75 min</div>
+        <div class="time-display" id="time-display">15:00</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:100%"></div></div>
+        <div class="controls">
+            <button class="btn btn-secondary" id="btn-prev" onclick="prevTechnique()">⏮</button>
+            <button class="btn btn-primary" id="btn-start" onclick="toggleTimer()">▶ Start</button>
+            <button class="btn btn-secondary" id="btn-next" onclick="nextTechnique()">⏭</button>
+        </div>
+    </div>
+
+    <!-- Sequence list -->
+    <div class="sequence-card">
+        <div class="sequence-header">
+            <span class="sequence-title">Practice Sequence</span>
+            <span class="total-time" id="total-time-label">Total: 75 min</span>
+        </div>
+        <div id="technique-list"></div>
+        <div class="add-row">
+            <input type="text" id="new-technique-name" placeholder="Add technique..." />
+            <input type="number" id="new-technique-min" value="10" min="1" max="120" style="width:52px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:white; border-radius:8px; padding:8px; font-size:0.85rem; text-align:center;" />
+            <button class="btn-add" onclick="addTechnique()">+ Add</button>
+        </div>
+    </div>
+
+    <div class="back-link"><a href="/">← Back to Siddhanath Kriya Yoga</a></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// DEFAULT SEQUENCE
+// ─────────────────────────────────────────────────────────────
+const DEFAULT_SEQUENCE = [
+    { name: 'Omkar Kriya',        minutes: 15, enabled: true },
+    { name: 'Shiva Shakti Kriya', minutes: 20, enabled: true },
+    { name: 'Mahamudra',          minutes: 10, enabled: true },
+    { name: 'Paravastha',         minutes: 15, enabled: true },
+    { name: 'Nabho Kriya',        minutes: 5,  enabled: true },
+    { name: 'Jyoti Mudra',        minutes: 10, enabled: true },
+];
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let sequence = loadSequence();
+let currentIdx = 0;
+let secondsLeft = 0;
+let totalSeconds = 0;
+let running = false;
+let interval = null;
+let completedSet = new Set();
+
+function loadSequence() {
+    try {
+        const saved = localStorage.getItem('kriya-timer-sequence');
+        if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    return DEFAULT_SEQUENCE.map(t => ({...t}));
+}
+
+function saveSequence() {
+    try { localStorage.setItem('kriya-timer-sequence', JSON.stringify(sequence)); } catch(e) {}
+}
+
+function activeSequence() {
+    return sequence.filter(t => t.enabled);
+}
+
+// ─────────────────────────────────────────────────────────────
+// TIMER LOGIC
+// ─────────────────────────────────────────────────────────────
+function startTimer() {
+    if (interval) clearInterval(interval);
+    running = true;
+    document.getElementById('btn-start').textContent = '⏸ Pause';
+    interval = setInterval(tick, 1000);
+}
+
+function pauseTimer() {
+    if (interval) clearInterval(interval);
+    running = false;
+    document.getElementById('btn-start').textContent = '▶ Resume';
+}
+
+function toggleTimer() {
+    if (running) {
+        pauseTimer();
+    } else {
+        if (secondsLeft === 0) {
+            // Start fresh at this technique
+            const active = activeSequence();
+            if (currentIdx >= active.length) { currentIdx = 0; completedSet.clear(); }
+            secondsLeft = active[currentIdx].minutes * 60;
+            totalSeconds = secondsLeft;
+        }
+        startTimer();
+    }
+}
+
+function tick() {
+    secondsLeft--;
+    updateTimerDisplay();
+    updateProgressBar();
+
+    // Woodblock sound every 15 seconds
+    if (secondsLeft > 0 && secondsLeft % 15 === 0) {
+        playTick();
+    }
+
+    if (secondsLeft <= 0) {
+        clearInterval(interval);
+        running = false;
+        completedSet.add(currentIdx);
+        renderList();
+
+        const active = activeSequence();
+        if (currentIdx + 1 < active.length) {
+            // Auto-advance after 2s
+            document.getElementById('btn-start').textContent = '⏭ Next';
+            setTimeout(() => {
+                currentIdx++;
+                secondsLeft = active[currentIdx].minutes * 60;
+                totalSeconds = secondsLeft;
+                updateTimerDisplay();
+                updateProgressBar();
+                updateStep();
+                document.getElementById('btn-start').textContent = '▶ Start';
+                startTimer();
+            }, 2000);
+        } else {
+            // All done
+            document.getElementById('btn-start').textContent = '✓ Done';
+            document.getElementById('complete-card').classList.add('show');
+            playComplete();
+        }
+    }
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    const el = document.getElementById('time-display');
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.className = 'time-display';
+    if (secondsLeft <= 30) el.classList.add('warning');
+    if (secondsLeft === 0) el.classList.add('done');
+}
+
+function updateProgressBar() {
+    const pct = totalSeconds > 0 ? (secondsLeft / totalSeconds * 100) : 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function updateStep() {
+    const active = activeSequence();
+    if (active.length === 0) return;
+    const curr = active[currentIdx] || active[0];
+    document.getElementById('current-name').textContent = curr.name;
+    const total = active.reduce((s, t) => s + t.minutes, 0);
+    document.getElementById('step-indicator').textContent =
+        `Step ${currentIdx + 1} of ${active.length} · Total: ${total} min`;
+    document.getElementById('total-time-label').textContent = `Total: ${total} min`;
+    renderList();
+}
+
+function prevTechnique() {
+    if (running) pauseTimer();
+    const active = activeSequence();
+    if (currentIdx > 0) currentIdx--;
+    secondsLeft = active[currentIdx].minutes * 60;
+    totalSeconds = secondsLeft;
+    document.getElementById('btn-start').textContent = '▶ Start';
+    document.getElementById('complete-card').classList.remove('show');
+    updateTimerDisplay();
+    updateProgressBar();
+    updateStep();
+}
+
+function nextTechnique() {
+    if (running) pauseTimer();
+    const active = activeSequence();
+    if (currentIdx + 1 < active.length) currentIdx++;
+    secondsLeft = active[currentIdx].minutes * 60;
+    totalSeconds = secondsLeft;
+    document.getElementById('btn-start').textContent = '▶ Start';
+    document.getElementById('complete-card').classList.remove('show');
+    updateTimerDisplay();
+    updateProgressBar();
+    updateStep();
+}
+
+// ─────────────────────────────────────────────────────────────
+// SEQUENCE RENDERING
+// ─────────────────────────────────────────────────────────────
+function renderList() {
+    const active = activeSequence();
+    const list = document.getElementById('technique-list');
+    list.innerHTML = sequence.map((t, i) => {
+        const activeIdx = active.findIndex(a => a === t);
+        const isCurrent = activeIdx === currentIdx && t.enabled;
+        const isDone = t.enabled && completedSet.has(activeIdx);
+        return `
+            <div class="technique-row">
+                <div class="technique-check ${isCurrent ? 'active' : ''} ${isDone ? 'done' : ''}"
+                     onclick="toggleEnabled(${i})">
+                    ${isDone ? '✓' : t.enabled ? '' : '○'}
+                </div>
+                <div class="technique-name ${isCurrent ? 'active' : ''} ${isDone ? 'done' : ''}">
+                    ${escapeHtml(t.name)}
+                </div>
+                <div class="technique-duration">
+                    <input type="number" value="${t.minutes}" min="1" max="120"
+                           onchange="updateDuration(${i}, this.value)"
+                           onclick="event.stopPropagation()" />
+                    <span style="margin-left:2px;font-size:0.7rem;opacity:0.5">m</span>
+                </div>
+                <button onclick="removeTechnique(${i})" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:1rem;padding:0 4px;line-height:1">×</button>
+            </div>
+        `;
+    }).join('');
+}
+
+function toggleEnabled(idx) {
+    sequence[idx].enabled = !sequence[idx].enabled;
+    currentIdx = 0;
+    completedSet.clear();
+    const active = activeSequence();
+    if (active.length > 0) {
+        secondsLeft = active[0].minutes * 60;
+        totalSeconds = secondsLeft;
+        updateTimerDisplay();
+        updateProgressBar();
+        updateStep();
+    }
+    saveSequence();
+    renderList();
+}
+
+function updateDuration(idx, val) {
+    const v = parseInt(val);
+    if (!isNaN(v) && v > 0 && v <= 120) {
+        sequence[idx].minutes = v;
+        saveSequence();
+        updateStep();
+    }
+}
+
+function removeTechnique(idx) {
+    if (sequence.length <= 1) return;
+    sequence.splice(idx, 1);
+    currentIdx = 0;
+    completedSet.clear();
+    const active = activeSequence();
+    secondsLeft = active.length > 0 ? active[0].minutes * 60 : 0;
+    totalSeconds = secondsLeft;
+    updateTimerDisplay();
+    updateProgressBar();
+    updateStep();
+    saveSequence();
+}
+
+function addTechnique() {
+    const nameEl = document.getElementById('new-technique-name');
+    const minEl = document.getElementById('new-technique-min');
+    const name = nameEl.value.trim();
+    const mins = parseInt(minEl.value) || 10;
+    if (!name) { nameEl.focus(); return; }
+    sequence.push({ name, minutes: mins, enabled: true });
+    nameEl.value = '';
+    saveSequence();
+    updateStep();
+}
+
+// ─────────────────────────────────────────────────────────────
+// SOUND (Web Audio API woodblock)
+// ─────────────────────────────────────────────────────────────
+let audioCtx = null;
+
+function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+}
+
+function playTick() {
+    try {
+        const ctx = getAudio();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+}
+
+function playComplete() {
+    try {
+        const ctx = getAudio();
+        [440, 554, 659, 880].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = freq;
+            const t = ctx.currentTime + i * 0.3;
+            gain.gain.setValueAtTime(0.3, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+            osc.start(t);
+            osc.stop(t + 0.5);
+        });
+    } catch(e) {}
+}
+
+// ─────────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────────
+function escapeHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+function init() {
+    const active = activeSequence();
+    secondsLeft = active.length > 0 ? active[0].minutes * 60 : 0;
+    totalSeconds = secondsLeft;
+    updateTimerDisplay();
+    updateProgressBar();
+    updateStep();
+
+    // Wake lock to keep screen on (mobile)
+    if ('wakeLock' in navigator) {
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && running) {
+                try { await navigator.wakeLock.request('screen'); } catch(e) {}
+            }
+        });
+    }
+}
+
+init();
+</script>
+</body>
+</html>
