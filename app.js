@@ -1156,17 +1156,22 @@ class YogaMarathonApp {
         };
         const icon = typeIcons[event.type] || '📅';
 
+        const safeTitle = this.escapeHtml(event.title || '');
+        const safeLocation = this.escapeHtml(event.location || '');
+        const safeDescription = this.escapeHtml(event.description || '');
+        const safeLink = /^https?:\/\//.test(event.link || '') ? this.escapeHtml(event.link) : '#';
+
         return `
             <div class="event-card ${event.featured ? 'featured' : ''}">
                 <div class="event-icon">${icon}</div>
                 <div class="event-content">
-                    <h3 class="event-title">${event.title}</h3>
+                    <h3 class="event-title">${safeTitle}</h3>
                     <div class="event-meta">
                         <span class="event-date">📅 ${dateRange}, ${startDate.getFullYear()}</span>
-                        <span class="event-location">📍 ${event.location}</span>
+                        <span class="event-location">📍 ${safeLocation}</span>
                     </div>
-                    <p class="event-description">${event.description}</p>
-                    <a href="${event.link}" target="_blank" class="event-link">
+                    <p class="event-description">${safeDescription}</p>
+                    <a href="${safeLink}" target="_blank" rel="noopener noreferrer" class="event-link">
                         Learn More & Register →
                     </a>
                 </div>
@@ -1776,8 +1781,8 @@ class YogaMarathonApp {
                 <div class="sangha-alert ${isFoodPrayer ? 'food-prayer-alert' : ''}">
                     <div class="alert-icon">${typeEmoji}</div>
                     <div class="alert-content">
-                        <div class="alert-title">${alert.title}</div>
-                        <div class="alert-message">${alert.message || ''}</div>
+                        <div class="alert-title">${this.escapeHtml(alert.title || '')}</div>
+                        <div class="alert-message">${this.escapeHtml(alert.message || '')}</div>
                         ${isFoodPrayer ? `
                             <div class="prayer-text-preview">
                                 <img src="https://gbxksgxezbljwlnlpkpz.supabase.co/storage/v1/object/public/ashram-photos/food-prayer/vadani-kaval-gheta.png"

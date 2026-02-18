@@ -565,6 +565,64 @@ function mountApiRoutes(app, supabase) {
     }
   });
 
+  // ─── POST /api/sangha/upload ─────────────────────────────
+  // Upload an image (base64) to Supabase Storage, return public URL.
+  const uploadLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 10,
+    message: { error: 'Too many uploads. Please wait.' },
+    standardHeaders: true,
+    legacyHeaders: false
+  });
+
+  app.post('/api/sangha/upload', uploadLimiter, async (req, res) => {
+    try {
+      const { member_id, image_base64, filename } = req.body;
+
+      if (!member_id || !image_base64) {
+        return res.status(400).json({ error: 'member_id and image_base64 required' });
+      }
+
+      // Validate base64 size (max ~5MB encoded)
+      if (image_base64.length > 7_000_000) {
+        return res.status(400).json({ error: 'Image too large (max 5MB)' });
+      }
+
+      // Strip data URL prefix if present
+      const base64Data = image_base64.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+
+      // Determine extension from filename or default to jpg
+      const ext = (filename || 'photo.jpg').split('.').pop().toLowerCase() || 'jpg';
+      const allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+      const safeExt = allowedExts.includes(ext) ? ext : 'jpg';
+
+      const storagePath = `${member_id}/${Date.now()}.${safeExt}`;
+
+      const { data, error } = await supabase.storage
+        .from('ashram-photos')
+        .upload(storagePath, buffer, {
+          contentType: `image/${safeExt === 'jpg' ? 'jpeg' : safeExt}`,
+          upsert: false
+        });
+
+      if (error) {
+        console.error('[API] Upload error:', error.message);
+        return res.status(500).json({ error: 'Upload failed' });
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('ashram-photos')
+        .getPublicUrl(data.path);
+
+      res.json({ url: urlData.publicUrl });
+
+    } catch (err) {
+      console.error('[API] Upload error:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // ─── POST /api/sangha/seva ──────────────────────────────
   // Log a seva activity.
   app.post('/api/sangha/seva', async (req, res) => {

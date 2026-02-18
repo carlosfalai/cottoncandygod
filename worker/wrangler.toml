@@ -8,3 +8,4 @@ account_id = "70443374001b15666eeaa70ab5f0062b"
 # TWILIO_AUTH_TOKEN
 # TWILIO_PHONE_FROM
 # NOTIFY_PHONE
+# ALLOWED_ORIGIN  (e.g. https://siddhanath-yoga.web.app — restricts CORS to production domain)
