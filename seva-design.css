@@ -1271,3 +1271,63 @@ body {
     max-width: 100%;
   }
 }
+
+/* Infrastructure Module */
+.infra-module{}
+.infra-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+.infra-main-title{font-size:1.25rem;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+.infra-main-desc{font-size:0.875rem;color:var(--text-secondary)}
+.infra-total-bar{text-align:right}
+.infra-total-label{display:block;font-size:0.75rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em}
+.infra-total-value{font-size:1.5rem;font-weight:700;color:var(--primary)}
+
+.infra-filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.infra-filter-btn{padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-full);font-size:0.8rem;font-weight:500;background:var(--surface);color:var(--text-secondary);cursor:pointer;transition:all 0.15s}
+.infra-filter-btn:hover{border-color:var(--primary);color:var(--primary)}
+.infra-filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.infra-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.infra-card{cursor:pointer;overflow:hidden;padding:0;transition:box-shadow 0.15s,transform 0.15s}
+.infra-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.infra-card-img{width:100%;height:160px;object-fit:cover}
+.infra-card-img-placeholder{width:100%;height:140px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+.infra-card-body{padding:16px}
+.infra-card-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.infra-category-tag{font-size:0.72rem;font-weight:600;color:var(--accent);background:var(--accent-light);border-radius:var(--radius-full);padding:2px 8px}
+.infra-phase-tag{font-size:0.72rem;font-weight:600;color:var(--text-secondary);background:var(--bg-subtle);border-radius:var(--radius-full);padding:2px 8px}
+.infra-status-badge{font-size:0.72rem;font-weight:600;border-radius:var(--radius-full);padding:2px 8px}
+.infra-card-title{font-size:0.975rem;font-weight:700;color:var(--text-primary);margin-bottom:6px;line-height:1.3}
+.infra-card-desc{font-size:0.82rem;color:var(--text-secondary);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.infra-progress-bar-wrap{width:100%;height:8px;background:var(--border);border-radius:var(--radius-full);overflow:hidden;margin-bottom:6px}
+.infra-progress-bar{height:100%;background:var(--primary);border-radius:var(--radius-full);transition:width 0.5s ease}
+.infra-progress-lg{height:10px;margin:8px 0}
+.infra-card-stats{display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:8px}
+.infra-raised{font-weight:700;color:var(--primary)}
+.infra-goal{color:var(--text-secondary)}
+.infra-card-footer{display:flex;align-items:center;justify-content:space-between}
+.infra-pct{font-size:0.78rem;font-weight:700;color:var(--text-secondary)}
+
+/* Detail View */
+.infra-back-btn{margin-bottom:20px}
+.infra-detail-img{width:100%;max-height:300px;object-fit:cover;border-radius:var(--radius-lg);margin-bottom:20px}
+.infra-detail-header{display:grid;grid-template-columns:1fr auto;gap:24px;margin-bottom:24px;align-items:start}
+@media(max-width:640px){.infra-detail-header{grid-template-columns:1fr}}
+.infra-detail-title{font-size:1.4rem;font-weight:700;color:var(--text-primary);margin:8px 0}
+.infra-detail-desc{font-size:0.9rem;color:var(--text-secondary);line-height:1.6}
+.infra-detail-funding{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;min-width:200px;text-align:center}
+.infra-big-number{font-size:1.8rem;font-weight:800;color:var(--primary)}
+.infra-big-label{font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px}
+.infra-pct-big{font-size:1rem;font-weight:700;color:var(--text-primary);margin-top:6px}
+
+.infra-pledge-form{margin-bottom:24px}
+.infra-pledge-form h4{font-size:1rem;font-weight:700;margin-bottom:4px}
+.infra-pledge-grid{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin:16px 0}
+@media(max-width:600px){.infra-pledge-grid{grid-template-columns:1fr}}
+
+.infra-pledges-section h4{font-size:0.95rem;font-weight:700;margin-bottom:12px;color:var(--text-primary)}
+.infra-pledges-list{display:flex;flex-direction:column;gap:8px}
+.infra-pledge-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px}
+.infra-pledge-name{font-weight:600;font-size:0.875rem;color:var(--text-primary)}
+.infra-pledge-amount{float:right;font-weight:700;color:var(--primary);font-size:0.9rem}
+.infra-pledge-msg{font-size:0.8rem;color:var(--text-secondary);margin-top:4px;font-style:italic}
