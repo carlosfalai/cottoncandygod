@@ -85,7 +85,7 @@
     };
 
     // Insert pledge
-    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+    const sb = SevaAuth.client || (window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null);
     if (!sb) return { error: 'Supabase not loaded' };
 
     const { error } = await sb.from('ashram_pledges').insert(payload);
