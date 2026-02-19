@@ -106,28 +106,35 @@
     const progress = pct(p.raised_usd, p.goal_usd);
     const status = STATUS_LABELS[p.status] || STATUS_LABELS.open;
     const cat = CATEGORY_LABELS[p.category] || p.category;
+    const catEmoji = cat.split(' ')[0];
 
     return `
-      <div class="infra-card seva-card" data-project-id="${esc(p.id)}" onclick="window._infraModule.openProject('${esc(p.id)}')">
-        ${p.photo_url ? `<img src="${esc(p.photo_url)}" alt="${esc(p.title)}" class="infra-card-img">` : `<div class="infra-card-img infra-card-img-placeholder"><span>${cat.split(' ')[0]}</span></div>`}
-        <div class="infra-card-body">
-          <div class="infra-card-meta">
-            <span class="infra-category-tag">${esc(cat)}</span>
-            <span class="infra-phase-tag">${esc(PHASE_LABELS[p.phase] || 'Phase ' + p.phase)}</span>
+      <div class="sg-project" data-project-id="${esc(p.id)}">
+        <div class="sg-thumb">
+          ${p.photo_url
+            ? `<img src="${esc(p.photo_url)}" alt="${esc(p.title)}">`
+            : `<div class="sg-no-image">${catEmoji}</div>`}
+        </div>
+        <div class="sg-content">
+          <div class="sg-top-row">
+            <span class="sg-cat-tag">${esc(cat)}</span>
+            <span class="sg-phase-tag">${esc(PHASE_LABELS[p.phase] || 'Phase ' + p.phase)}</span>
           </div>
-          <h3 class="infra-card-title">${esc(p.title)}</h3>
-          <p class="infra-card-desc">${esc(p.description)}</p>
-
-          <div class="infra-progress-bar-wrap">
-            <div class="infra-progress-bar" style="width:${progress}%"></div>
+          <div class="sg-subject">${esc(p.title)}</div>
+          <div class="sg-comment">${esc(p.description)}</div>
+          <div class="sg-progress-row">
+            <div class="sg-progress-wrap"><div class="sg-progress-fill" style="width:${progress}%"></div></div>
+            <span class="sg-progress-pct">${progress}%</span>
           </div>
-          <div class="infra-card-stats">
-            <span class="infra-raised">${fmt(p.raised_usd)} raised</span>
-            <span class="infra-goal">Goal: ${fmt(p.goal_usd)}</span>
+          <div class="sg-stats">
+            <span class="sg-stat-raised">${fmt(p.raised_usd)} raised</span>
+            <span class="sg-stat-goal">Goal: ${fmt(p.goal_usd)}</span>
+            <span class="sg-stat-status" style="color:${status.color}">${esc(status.label)}</span>
           </div>
-          <div class="infra-card-footer">
-            <span class="infra-status-badge" style="background:${status.color}20;color:${status.color}">${esc(status.label)}</span>
-            <span class="infra-pct">${progress}%</span>
+          <div class="sg-actions">
+            <button class="sg-action-btn sg-btn-pledge" onclick="window._infraModule.openProject('${esc(p.id)}')">💰 Pledge</button>
+            <button class="sg-action-btn" onclick="window._infraModule.openProject('${esc(p.id)}')">📋 Details</button>
+            <button class="sg-action-btn" onclick="window._infraModule.openProject('${esc(p.id)}')">📸 Photos</button>
           </div>
         </div>
       </div>
@@ -236,9 +243,9 @@
           `).join('')}
         </div>
 
-        <div class="infra-grid">
+        <div class="sg-projects-list">
           ${filtered.length === 0
-            ? '<p class="empty-state">No projects found.</p>'
+            ? '<p class="empty-state">No projects yet. Projects will be posted by the ashram team.</p>'
             : filtered.map(renderProjectCard).join('')}
         </div>
       `;
