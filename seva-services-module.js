@@ -58,7 +58,7 @@
           <span class="service-emoji">${svc.emoji}</span>
           <div>
             <h3 class="service-name">${esc(svc.name)}</h3>
-            <span class="service-price" style="color:${svc.color}">${esc(svc.price)}</span>
+            <span class="service-price" style="color:${svc.color}">Free</span>
           </div>
           ${subscribed ? '<span class="service-active-badge">✓ Active</span>' : ''}
         </div>
@@ -83,11 +83,6 @@
     if (!container) return;
 
     const user = SevaAuth.user;
-    if (!user) {
-      container.innerHTML = `<div class="empty-state">🙏 Sign in to access learning services.</div>`;
-      return;
-    }
-
     container.innerHTML = `
       <div class="services-module">
         <div class="services-header">
