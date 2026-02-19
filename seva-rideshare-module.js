@@ -206,17 +206,15 @@
       <div class="rs-module">
         <div class="rs-header">
           <h2 class="infra-main-title">🚗 Ride Share</h2>
-          <p class="infra-main-desc">See who's traveling to and from the ashram. Click any date to post your ride.</p>
+          <p class="infra-main-desc">See who's traveling to and from the ashram. Click a date to post or see rides.</p>
         </div>
         <div class="rs-layout">
-          <div>
-            ${renderCalendar()}
-            ${selectedDate ? `<div class="rs-day-panel" style="margin-top:12px">${renderDayPanel()}</div>` : ''}
-          </div>
-          <div class="rs-side">
-            <h4 class="rs-upcoming-title">All Upcoming Rides</h4>
-            <div class="rs-upcoming-list">${renderUpcomingList()}</div>
-          </div>
+          ${renderCalendar()}
+          <div class="rs-side">${renderDayPanel()}</div>
+        </div>
+        <div class="rs-upcoming-section">
+          <h4 class="rs-upcoming-title">All Upcoming Rides — Soonest First</h4>
+          <div class="rs-upcoming-list">${renderUpcomingList()}</div>
         </div>
       </div>`;
   }

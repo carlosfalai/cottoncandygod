@@ -1551,3 +1551,4 @@ body {
 .rs-upcoming-route{font-size:0.875rem;font-weight:700;color:var(--text-primary)}
 .rs-upcoming-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:0.78rem;color:var(--text-secondary)}
 .rs-upcoming-notes{font-style:italic;color:var(--text-tertiary)}
+.rs-upcoming-section{margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
