@@ -152,10 +152,7 @@
             <label>Seats Available</label>
             <input type="number" id="rs-seats" placeholder="0 = need a ride" min="0" max="8" value="0">
           </div>
-          <div class="form-group">
-            <label>WhatsApp (optional)</label>
-            <input type="text" id="rs-whatsapp" placeholder="+91 9876543210">
-          </div>
+          <!-- WhatsApp auto-loaded from profile -->
           <div class="form-group">
             <label>Notes</label>
             <input type="text" id="rs-notes" placeholder="Flight number, meeting point..." maxlength="200">
@@ -208,12 +205,19 @@
       const user = SevaAuth.user;
       if (!user) { alert('Please sign in first.'); return; }
 
-      // Name from profile
+      // Name + WhatsApp from profile
       const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Hamsa';
+      let whatsapp = null;
+      try {
+        const sb2 = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+        if (sb2) {
+          const { data: prof } = await sb2.from('hamsa_profiles').select('whatsapp_number,whatsapp_country_code').eq('id', user.id).single();
+          if (prof?.whatsapp_number) whatsapp = (prof.whatsapp_country_code || '') + prof.whatsapp_number;
+        }
+      } catch(e) {}
       const route = document.getElementById('rs-route')?.value;
       const time = document.getElementById('rs-time')?.value;
       const seats = document.getElementById('rs-seats')?.value;
-      const whatsapp = document.getElementById('rs-whatsapp')?.value?.trim();
       const notes = document.getElementById('rs-notes')?.value?.trim();
       const statusEl = document.getElementById('rs-status');
       const btn = document.getElementById('rs-submit');
