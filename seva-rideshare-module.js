@@ -137,10 +137,7 @@
       <div class="rs-form seva-card" style="margin-bottom:16px">
         <h5 style="margin-bottom:12px;font-size:0.875rem;font-weight:700">Post your travel for ${fmtDate(selectedDate)}</h5>
         <div class="profile-form-grid">
-          <div class="form-group">
-            <label>Your Name</label>
-            <input type="text" id="rs-name" placeholder="Your name" maxlength="80">
-          </div>
+          <!-- Name auto-filled from profile -->
           <div class="form-group">
             <label>Route</label>
             <select id="rs-route">
@@ -211,7 +208,8 @@
       const user = SevaAuth.user;
       if (!user) { alert('Please sign in first.'); return; }
 
-      const name = document.getElementById('rs-name')?.value?.trim();
+      // Name from profile
+      const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Hamsa';
       const route = document.getElementById('rs-route')?.value;
       const time = document.getElementById('rs-time')?.value;
       const seats = document.getElementById('rs-seats')?.value;
@@ -220,8 +218,8 @@
       const statusEl = document.getElementById('rs-status');
       const btn = document.getElementById('rs-submit');
 
-      if (!name || !route) {
-        statusEl.textContent = '⚠️ Name and route are required.';
+      if (!route) {
+        statusEl.textContent = '⚠️ Route is required.';
         statusEl.className = 'save-status error';
         return;
       }
