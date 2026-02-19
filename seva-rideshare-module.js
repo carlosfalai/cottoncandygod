@@ -36,8 +36,11 @@
     return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   }
 
+  let allUpcomingRides = [];
+
   async function loadRides() {
     try {
+      // Load current month for calendar dots
       const firstDay = toDateStr(currentYear, currentMonth, 1);
       const lastDay = toDateStr(currentYear, currentMonth + 1, 0);
       const resp = await fetch(
@@ -46,7 +49,40 @@
       );
       if (!resp.ok) return;
       rides = await resp.json();
+
+      // Load ALL upcoming rides for the list below
+      const today = toDateStr(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      const resp2 = await fetch(
+        `${SUPABASE_URL}/rest/v1/seva_rides?departure_date=gte.${today}&order=departure_date.asc,departure_time.asc&limit=50`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+      );
+      if (resp2.ok) allUpcomingRides = await resp2.json();
     } catch (e) { rides = []; }
+  }
+
+  function renderUpcomingList() {
+    if (allUpcomingRides.length === 0) {
+      return `<p class="empty-state" style="padding:16px 0">No upcoming rides posted yet. Click a date on the calendar to post yours.</p>`;
+    }
+    return allUpcomingRides.map(r => {
+      const wa = r.whatsapp
+        ? `<a class="wa-link" href="https://wa.me/${r.whatsapp.replace(/\D/g,'')}" target="_blank" rel="noopener">💬 WhatsApp</a>`
+        : '';
+      const d = new Date(r.departure_date + 'T12:00:00');
+      const dateLabel = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+      const timeLabel = r.departure_time ? r.departure_time.substring(0,5) : '';
+      return `
+        <div class="rs-upcoming-row">
+          <div class="rs-upcoming-date">${esc(dateLabel)}${timeLabel ? ' · ' + esc(timeLabel) : ''}</div>
+          <div class="rs-upcoming-route">${esc(r.route)}</div>
+          <div class="rs-upcoming-meta">
+            <span>👤 ${esc(r.driver_name)}</span>
+            ${r.seats_available ? `<span>🪑 ${esc(r.seats_available)} seat${r.seats_available > 1 ? 's' : ''}</span>` : '<span>🙋 Needs ride</span>'}
+            ${r.notes ? `<span class="rs-upcoming-notes">${esc(r.notes)}</span>` : ''}
+          </div>
+          ${wa ? `<div>${wa}</div>` : ''}
+        </div>`;
+    }).join('');
   }
 
   function ridesOnDate(ds) {
@@ -169,12 +205,18 @@
     c.innerHTML = `
       <div class="rs-module">
         <div class="rs-header">
-          <h2 class="infra-main-title">🚗 Travel Coordination</h2>
-          <p class="infra-main-desc">Coordinate rides to and from the ashram. Post your travel date or find someone going your way.</p>
+          <h2 class="infra-main-title">🚗 Ride Share</h2>
+          <p class="infra-main-desc">See who's traveling to and from the ashram. Click any date to post your ride.</p>
         </div>
         <div class="rs-layout">
-          ${renderCalendar()}
-          <div class="rs-side">${renderDayPanel()}</div>
+          <div>
+            ${renderCalendar()}
+            ${selectedDate ? `<div class="rs-day-panel" style="margin-top:12px">${renderDayPanel()}</div>` : ''}
+          </div>
+          <div class="rs-side">
+            <h4 class="rs-upcoming-title">All Upcoming Rides</h4>
+            <div class="rs-upcoming-list">${renderUpcomingList()}</div>
+          </div>
         </div>
       </div>`;
   }
@@ -256,7 +298,7 @@
   };
 
   SevaRegistry.register('rideshare', {
-    name: 'Ride Share',
+    name: 'Rides',
     emoji: '🚗',
     order: 7,
     render() { return '<div class="seva-empty-state">Loading travel calendar...</div>'; },
