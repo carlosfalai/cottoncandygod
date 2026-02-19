@@ -48,17 +48,15 @@ class SevaCore {
     const app = document.getElementById('app');
     app.innerHTML = `
       ${this._renderBillboard()}
-      <div class="seva-app">
-        ${this._renderHeader()}
-        ${this._renderClock()}
-        ${this._renderNav()}
-        <div id="seva-module-container" class="seva-module-container">
-          <div class="seva-empty-state">
-            <p>Select a section above to get started.</p>
-          </div>
+      ${this._renderHeader()}
+      <div class="seva-page">
+        <div class="seva-container">
+          ${this._renderClock()}
+          ${this._renderNav()}
+          <div id="seva-module-container" class="seva-module-container"></div>
         </div>
-        ${this._renderFooter()}
       </div>
+      ${this._renderFooter()}
     `;
   }
 
