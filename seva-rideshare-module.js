@@ -251,7 +251,7 @@
       const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Hamsa';
       let whatsapp = null;
       try {
-        const sb2 = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const sb2 = SevaAuth.client || window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
         if (sb2) {
           const { data: prof } = await sb2.from('hamsa_profiles').select('whatsapp_number,whatsapp_country_code').eq('id', user.id).single();
           if (prof?.whatsapp_number) whatsapp = (prof.whatsapp_country_code || '') + prof.whatsapp_number;
@@ -273,7 +273,8 @@
       btn.disabled = true; btn.textContent = 'Posting...'; statusEl.textContent = '';
 
       try {
-        const sb = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Use SevaAuth.client (already has auth session) or fall back to anon
+        const sb = SevaAuth.client || window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
         if (!sb) throw new Error('Supabase not loaded');
         const { error } = await sb.from('seva_rides').insert({
           driver_name: name,

@@ -28,7 +28,17 @@
       telegramLink: 'https://t.me/gurunath_teachings_bot',
       color: '#C9A227',
     },
-    // Sanskrit bot coming when ready
+    {
+      id: 'sanskrit',
+      name: 'Sanskrit & Bhagavad Gita',
+      emoji: '📖',
+      desc: 'Learn Sanskrit word by word through the Bhagavad Gita. All 18 chapters, 700 verses with pronunciation and meanings.',
+      features: ['All 18 chapters', 'Word-by-word Sanskrit', 'Pronunciation guide', 'Practice mode'],
+      telegramBot: null,
+      telegramLink: null,
+      webLink: 'https://gita-learner-sanskrit.pages.dev',
+      color: '#117743',
+    },
   ];
 
   function esc(s) { return SevaUtils ? SevaUtils.escapeHtml(String(s || '')) : String(s || ''); }
@@ -57,9 +67,12 @@
           ${svc.features.map(f => `<li>${esc(f)}</li>`).join('')}
         </ul>
         <div class="service-actions">
-          <a href="${esc(svc.telegramLink)}" target="_blank" class="seva-btn seva-btn-primary">
-            Open on Telegram @${esc(svc.telegramBot)} →
-          </a>
+          ${svc.telegramLink
+            ? `<a href="${esc(svc.telegramLink)}" target="_blank" class="seva-btn seva-btn-primary">Open on Telegram @${esc(svc.telegramBot)} →</a>`
+            : svc.webLink
+              ? `<a href="${esc(svc.webLink)}" target="_blank" class="seva-btn seva-btn-primary">Open ${esc(svc.name)} →</a>`
+              : `<button class="seva-btn seva-btn-ghost" disabled>Coming Soon</button>`
+          }
         </div>
       </div>
     `;
