@@ -6,22 +6,29 @@
 
 (function() {
   const STRIPE_KEY = 'pk_live_51RIw72FpJAvVCZQIsyvnhNEIzecCvWRQda9bekbkpE4gxHzzELUiRGGDbLPJHL1SSQGnnoT92njBcw9aYvWckfgM00TO3wXZXs';
-  const SQUIRE_HINDI_URL = 'https://squire-siddhanath.onrender.com';
-  const PRICE_MONTHLY = 'Free';
-
   // Only show services that are actually live
   const SERVICES = [
     {
       id: 'hindi',
       name: 'Conversational Hindi',
       emoji: '🇮🇳',
-      desc: 'Learn everyday Hindi through real conversations. Designed for Hamsas who visit the ashram in India. Practice greetings, daily phrases, and spiritual vocabulary.',
-      features: ['Daily conversation practice', 'Ashram-specific vocabulary', 'Spiritual vocabulary', 'Progress tracking'],
-      price: PRICE_MONTHLY,
-      bot: SQUIRE_HINDI_URL,
+      desc: 'Learn everyday Hindi through real conversations with an AI coach. Designed for Hamsas visiting the ashram in India.',
+      features: ['20-chapter curriculum', 'Daily conversation practice', 'Ashram vocabulary', 'Progress tracking'],
+      telegramBot: 'Squire_siddhanath_bot',
+      telegramLink: 'https://t.me/Squire_siddhanath_bot',
       color: '#FF9933',
     },
-    // Sanskrit & Gurunath bots coming when ready
+    {
+      id: 'gurunath',
+      name: "Gurunath's Teachings",
+      emoji: '🪷',
+      desc: "Study Yogiraj Gurunath Siddhanath's recorded teachings via AI. Ask questions, explore Kriya Yoga philosophy and spiritual wisdom.",
+      features: ['4,973 verbatim teachings', 'Q&A with AI guide', 'Kriya Yoga philosophy', 'Science & spirituality'],
+      telegramBot: 'gurunath_teachings_bot',
+      telegramLink: 'https://t.me/gurunath_teachings_bot',
+      color: '#C9A227',
+    },
+    // Sanskrit bot coming when ready
   ];
 
   function esc(s) { return SevaUtils ? SevaUtils.escapeHtml(String(s || '')) : String(s || ''); }
@@ -50,10 +57,9 @@
           ${svc.features.map(f => `<li>${esc(f)}</li>`).join('')}
         </ul>
         <div class="service-actions">
-          ${svc.bot
-            ? `<a href="${esc(svc.bot)}" target="_blank" class="seva-btn seva-btn-primary">Open ${esc(svc.name)} Bot →</a>`
-            : `<button class="seva-btn seva-btn-ghost" disabled>Coming Soon</button>`
-          }
+          <a href="${esc(svc.telegramLink)}" target="_blank" class="seva-btn seva-btn-primary">
+            Open on Telegram @${esc(svc.telegramBot)} →
+          </a>
         </div>
       </div>
     `;
