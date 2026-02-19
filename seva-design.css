@@ -1331,3 +1331,125 @@ body {
 .infra-pledge-name{font-weight:600;font-size:0.875rem;color:var(--text-primary)}
 .infra-pledge-amount{float:right;font-weight:700;color:var(--primary);font-size:0.9rem}
 .infra-pledge-msg{font-size:0.8rem;color:var(--text-secondary);margin-top:4px;font-style:italic}
+
+/* ══════════════════════════════════════════════════════════
+   MODULE: Seva Tasks (System 2)
+   ══════════════════════════════════════════════════════════ */
+
+.tasks-filter-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.tasks-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; }
+.task-card { display:flex; flex-direction:column; gap:10px; }
+.task-card-header { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+.task-badges { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.task-title { font-size:15px; font-weight:700; color:var(--text-primary); line-height:1.3; }
+.task-desc { font-size:13px; color:var(--text-secondary); line-height:1.5; }
+.task-skill-tags { display:flex; flex-wrap:wrap; gap:6px; }
+.task-skill-tag { display:inline-flex; align-items:center; font-size:11px; font-weight:500; background:var(--primary-light); color:var(--primary-dark); border-radius:var(--radius-full); padding:3px 9px; border:1px solid rgba(17,119,67,0.15); }
+.task-category-badge { font-size:11px; font-weight:600; background:var(--navy-light); color:var(--navy); border-radius:var(--radius-full); padding:3px 10px; border:1px solid rgba(29,43,78,0.15); }
+.task-risk-badge { display:inline-flex; align-items:center; font-size:11px; font-weight:600; padding:2px 8px; border-radius:var(--radius-full); border:1px solid var(--border); background:var(--surface); color:var(--text-secondary); }
+.risk-low { background:var(--success-light); color:#027A48; border-color:rgba(18,183,106,0.2); }
+.risk-skilled { background:var(--warning-light); color:#B54708; border-color:rgba(247,144,9,0.2); }
+.risk-licensed { background:var(--error-light); color:#B42318; border-color:rgba(240,68,56,0.2); }
+.task-location-badge { display:inline-flex; align-items:center; font-size:11px; font-weight:600; padding:2px 8px; border-radius:var(--radius-full); border:1px solid var(--border); background:var(--bg-subtle); color:var(--text-secondary); }
+.task-status-badge { display:inline-flex; align-items:center; font-size:11px; font-weight:700; padding:3px 10px; border-radius:var(--radius-full); }
+.status-open { background:var(--navy-light); color:var(--navy); border:1px solid rgba(29,43,78,0.2); }
+.status-claimed { background:var(--warning-light); color:#B54708; border:1px solid rgba(247,144,9,0.2); }
+.status-complete { background:var(--success-light); color:#027A48; border:1px solid rgba(18,183,106,0.2); }
+.task-claimed-by { font-size:12px; color:var(--text-secondary); }
+.task-card-footer { margin-top:auto; padding-top:8px; border-top:1px solid var(--border); }
+
+/* ══════════════════════════════════════════════════════════
+   MODULE: Ride Share (System 3)
+   ══════════════════════════════════════════════════════════ */
+
+.rides-header-actions, .help-header-actions { margin-bottom:20px; }
+.rides-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px; }
+.ride-card { display:flex; flex-direction:column; gap:8px; }
+.ride-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.ride-from { font-size:15px; font-weight:700; color:var(--text-primary); }
+.ride-date { font-size:12px; color:var(--text-secondary); margin-top:2px; }
+.ride-seats { text-align:center; background:var(--primary-light); border-radius:var(--radius-md); padding:8px 14px; min-width:56px; }
+.ride-seats-num { display:block; font-size:22px; font-weight:800; color:var(--primary); line-height:1; }
+.ride-seats-label { display:block; font-size:10px; font-weight:600; color:var(--primary-dark); text-transform:uppercase; letter-spacing:0.4px; }
+.ride-driver { font-size:13px; color:var(--text-secondary); }
+.ride-notes { font-size:13px; color:var(--text-secondary); line-height:1.5; font-style:italic; }
+.ride-card-footer { margin-top:auto; padding-top:10px; border-top:1px solid var(--border); }
+.ride-form-card, .help-form-card { margin-bottom:24px; }
+.ride-form-actions, .help-form-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:8px; }
+
+/* ══════════════════════════════════════════════════════════
+   MODULE: Gurumata's Will (System 4)
+   ══════════════════════════════════════════════════════════ */
+
+.gurumata-quote { font-family:var(--font-serif); font-size:18px; font-style:italic; color:var(--accent-dark); text-align:center; padding:20px 32px; background:var(--accent-light); border-radius:var(--radius-lg); border:1px solid rgba(201,162,39,0.25); margin-bottom:28px; line-height:1.6; }
+.gurumata-quote-mark { font-size:28px; color:var(--accent); vertical-align:-4px; line-height:1; }
+.gurumata-tasks { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; }
+.gurumata-card { display:flex; flex-direction:column; gap:10px; border-top:3px solid var(--accent-light); }
+.gurumata-card--claimed { border-top-color:var(--accent); opacity:0.85; }
+.gurumata-task-icon { font-size:32px; line-height:1; }
+.gurumata-task-title { font-size:15px; font-weight:700; color:var(--text-primary); }
+.gurumata-task-desc { font-size:13px; color:var(--text-secondary); line-height:1.6; flex:1; }
+.gurumata-task-footer { margin-top:auto; padding-top:10px; border-top:1px solid var(--border); }
+.gurumata-claimed { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.gurumata-claimed-badge { font-size:12px; font-weight:700; color:#027A48; background:var(--success-light); padding:3px 10px; border-radius:var(--radius-full); }
+.gurumata-claimed-who { font-size:12px; color:var(--text-secondary); }
+
+/* ══════════════════════════════════════════════════════════
+   MODULE: Seva Credits / Thank You (System 5)
+   ══════════════════════════════════════════════════════════ */
+
+.thankyou-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:16px; }
+.thankyou-card { display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; padding:28px 20px; background:linear-gradient(135deg, var(--accent-light) 0%, var(--surface) 100%); border-color:rgba(201,162,39,0.3); }
+.thankyou-glow { font-size:36px; }
+.thankyou-task-title { font-family:var(--font-serif); font-size:16px; font-weight:400; color:var(--text-primary); line-height:1.3; }
+.thankyou-date { font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; }
+.thankyou-who { font-size:14px; color:var(--text-primary); }
+.thankyou-message { font-size:13px; color:var(--accent-dark); font-style:italic; }
+.thankyou-loading { color:var(--text-secondary); font-size:14px; padding:32px; text-align:center; }
+
+/* ══════════════════════════════════════════════════════════
+   MODULE: Organizer / Need Help (System 6)
+   ══════════════════════════════════════════════════════════ */
+
+.help-requests { display:flex; flex-direction:column; gap:16px; }
+.help-card { display:flex; flex-direction:column; gap:8px; }
+.help-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.help-retreat-name { font-size:16px; font-weight:700; color:var(--text-primary); }
+.help-organizer { font-size:12px; color:var(--text-secondary); margin-top:2px; }
+.help-date-badge { font-size:12px; font-weight:600; color:var(--primary-dark); background:var(--primary-light); padding:4px 10px; border-radius:var(--radius-full); white-space:nowrap; flex-shrink:0; }
+.help-role { font-size:13px; color:var(--text-secondary); line-height:1.6; }
+.help-card-footer { margin-top:4px; }
+.help-count-badge { display:inline-flex; align-items:center; font-size:12px; font-weight:600; background:var(--bg-subtle); color:var(--text-secondary); padding:4px 12px; border-radius:var(--radius-full); border:1px solid var(--border); }
+
+/* ══════════════════════════════════════════════════════════
+   MODULE: Quality Check (System 7)
+   ══════════════════════════════════════════════════════════ */
+
+.quality-list { display:flex; flex-direction:column; gap:12px; }
+.quality-item { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-xs); overflow:hidden; }
+.quality-item-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; cursor:pointer; gap:12px; user-select:none; transition:background 0.15s; }
+.quality-item-header:hover { background:var(--bg-subtle); }
+.quality-item-info { flex:1; min-width:0; }
+.quality-task-title { font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:6px; }
+.quality-item-badges { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.quality-expand-icon { color:var(--text-tertiary); font-size:12px; flex-shrink:0; }
+.quality-verif-count { font-size:11px; font-weight:600; background:var(--primary-light); color:var(--primary-dark); padding:2px 8px; border-radius:var(--radius-full); }
+.quality-item-body { padding:16px 20px; border-top:1px solid var(--border); background:var(--bg-subtle); }
+.quality-verifs-list { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+.quality-verification-item { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px 14px; }
+.quality-verif-header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.quality-verif-name { font-size:13px; color:var(--text-primary); }
+.quality-verif-role { font-size:11px; color:var(--text-tertiary); background:var(--bg-subtle); border-radius:var(--radius-full); padding:1px 8px; text-transform:uppercase; letter-spacing:0.3px; }
+.quality-photo-link { display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:500; color:var(--primary); text-decoration:none; margin-bottom:6px; }
+.quality-photo-link:hover { text-decoration:underline; }
+.quality-verif-notes { font-size:13px; color:var(--text-secondary); line-height:1.5; }
+.quality-no-verifs { font-size:13px; color:var(--text-tertiary); font-style:italic; margin-bottom:12px; }
+.quality-verif-form { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; }
+.quality-verif-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px; }
+.quality-signin-prompt { font-size:13px; color:var(--text-secondary); }
+
+@media (max-width:768px) {
+  .tasks-grid, .rides-grid, .gurumata-tasks, .thankyou-grid { grid-template-columns:1fr; }
+  .quality-item-header { padding:14px 16px; }
+  .quality-item-body { padding:14px 16px; }
+}
