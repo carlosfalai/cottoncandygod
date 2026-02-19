@@ -7,39 +7,21 @@
 (function() {
   const STRIPE_KEY = 'pk_live_51RIw72FpJAvVCZQIsyvnhNEIzecCvWRQda9bekbkpE4gxHzzELUiRGGDbLPJHL1SSQGnnoT92njBcw9aYvWckfgM00TO3wXZXs';
   const SQUIRE_HINDI_URL = 'https://squire-siddhanath.onrender.com';
-  const PRICE_MONTHLY = '$17 / month';
+  const PRICE_MONTHLY = 'Free';
 
+  // Only show services that are actually live
   const SERVICES = [
     {
       id: 'hindi',
       name: 'Conversational Hindi',
       emoji: '🇮🇳',
       desc: 'Learn everyday Hindi through real conversations. Designed for Hamsas who visit the ashram in India. Practice greetings, daily phrases, and spiritual vocabulary.',
-      features: ['Daily conversation practice', 'Ashram-specific vocabulary', 'Audio pronunciation guide', 'Progress tracking'],
+      features: ['Daily conversation practice', 'Ashram-specific vocabulary', 'Spiritual vocabulary', 'Progress tracking'],
       price: PRICE_MONTHLY,
       bot: SQUIRE_HINDI_URL,
       color: '#FF9933',
     },
-    {
-      id: 'sanskrit',
-      name: 'Sanskrit & Gita',
-      emoji: '🕉️',
-      desc: 'Learn Sanskrit mantra pronunciation and study the Bhagavad Gita. Understand the sacred texts in their original language.',
-      features: ['Mantra pronunciation', 'Bhagavad Gita study', 'Sanskrit alphabet', 'Spiritual texts'],
-      price: PRICE_MONTHLY,
-      bot: null,
-      color: '#117743',
-    },
-    {
-      id: 'gurunath',
-      name: "Gurunath's Teachings",
-      emoji: '🪷',
-      desc: "Deep study of Yogiraj Gurunath Siddhanath's recorded teachings. AI-guided exploration of Kriya Yoga philosophy, science correlates, and spiritual wisdom.",
-      features: ["4,973 verbatim teachings", 'Science correlates', 'Kriya Yoga philosophy', 'Q&A with AI guide'],
-      price: PRICE_MONTHLY,
-      bot: null,
-      color: '#C9A227',
-    }
+    // Sanskrit & Gurunath bots coming when ready
   ];
 
   function esc(s) { return SevaUtils ? SevaUtils.escapeHtml(String(s || '')) : String(s || ''); }
@@ -68,13 +50,9 @@
           ${svc.features.map(f => `<li>${esc(f)}</li>`).join('')}
         </ul>
         <div class="service-actions">
-          ${subscribed
-            ? (svc.bot
-                ? `<a href="${esc(svc.bot)}" target="_blank" class="seva-btn seva-btn-primary">Open ${esc(svc.name)} Bot →</a>`
-                : `<button class="seva-btn seva-btn-primary" disabled>Coming Soon</button>`)
-            : `<button class="seva-btn seva-btn-primary" onclick="window._services.subscribe('${esc(svc.id)}', '${esc(svc.name)}')">
-                Subscribe — ${esc(svc.price)}
-               </button>`
+          ${svc.bot
+            ? `<a href="${esc(svc.bot)}" target="_blank" class="seva-btn seva-btn-primary">Open ${esc(svc.name)} Bot →</a>`
+            : `<button class="seva-btn seva-btn-ghost" disabled>Coming Soon</button>`
           }
         </div>
       </div>
@@ -95,7 +73,7 @@
       <div class="services-module">
         <div class="services-header">
           <h2 class="infra-main-title">📚 Learning Services</h2>
-          <p class="infra-main-desc">AI-powered language and teachings study. Each service is $17/month — revenue supports the ashram.</p>
+          <p class="infra-main-desc">AI-powered language and teachings study. Free for Hamsas.</p>
         </div>
         <div class="services-grid">
           ${SERVICES.map(renderServiceCard).join('')}
