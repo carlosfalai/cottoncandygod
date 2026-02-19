@@ -215,9 +215,9 @@
 
   if (window.SevaRegistry) {
     SevaRegistry.register('sangha', {
-      name: 'Sangha Feed',
-      emoji: '🙏',
-      order: 20,
+      name: 'Forum',
+      emoji: '💬',
+      order: 9,
       render,
       init: initListeners,
     });
